@@ -1,0 +1,24 @@
+{
+  "name": "BMW Club Uganda",
+  "short_name": "BMW Club UG",
+  "description": "The official digital home for BMW enthusiasts across Uganda",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0E1E36",
+  "theme_color": "#1C69D4",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/club-logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

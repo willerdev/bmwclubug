@@ -1,26 +1,178 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bmw-blue: #1c69d4;
+  --bmw-blue-light: #4d9fff;
+  --bmw-dark-blue: #002c5f;
+  --bmw-navy: #0b1f3a;
+  --bmw-red: #eb0129;
+  --bmw-red-dark: #c4001d;
+  --background: #0e1e36;
+  --background-light: #152a45;
+  --foreground: #f0f6ff;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border-strong: rgba(255, 255, 255, 0.28);
+  --glass-shine: rgba(255, 255, 255, 0.35);
+  --glass-blur: 28px;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-light: var(--background-light);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bmw-blue: var(--bmw-blue);
+  --color-bmw-blue-light: var(--bmw-blue-light);
+  --color-bmw-dark-blue: var(--bmw-dark-blue);
+  --color-bmw-navy: var(--bmw-navy);
+  --color-bmw-red: var(--bmw-red);
+  --color-glass: var(--glass-bg);
+  --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bmw-blue) var(--bmw-navy);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  overflow-x: hidden;
 }
+
+::selection {
+  background: var(--bmw-blue);
+  color: white;
+}
+
+.page-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(28, 105, 212, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 20%, rgba(235, 1, 41, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 70% at 50% 100%, rgba(0, 44, 95, 0.35) 0%, transparent 60%),
+    linear-gradient(165deg, #0b1f3a 0%, #0e1e36 35%, #152a45 70%, #1a3558 100%);
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 0 var(--glass-shine), 0 8px 32px rgba(0, 20, 50, 0.15);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.4), 0 12px 40px rgba(0, 20, 50, 0.2);
+}
+
+.glass-frosted {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(40px) saturate(220%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+.glass-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 50%, rgba(28, 105, 212, 0.06) 100%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(190%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 16px 48px rgba(0, 44, 95, 0.18);
+}
+
+.carbon-texture {
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 255, 255, 0.015) 2px, rgba(255, 255, 255, 0.015) 4px);
+}
+
+.metallic-gradient {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(28, 105, 212, 0.06) 40%, rgba(0, 44, 95, 0.12) 100%);
+}
+
+.bmw-gradient {
+  background: linear-gradient(135deg, var(--bmw-blue) 0%, var(--bmw-dark-blue) 100%);
+}
+
+.bmw-m-stripe {
+  background: linear-gradient(90deg, var(--bmw-blue) 0%, var(--bmw-blue) 33%, var(--bmw-red) 33%, var(--bmw-red) 66%, var(--bmw-blue-light) 66%, var(--bmw-blue-light) 100%);
+}
+
+.bmw-gradient-red {
+  background: linear-gradient(135deg, var(--bmw-red) 0%, var(--bmw-red-dark) 100%);
+}
+
+.glow-blue {
+  box-shadow: 0 0 24px rgba(28, 105, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glow-red {
+  box-shadow: 0 0 24px rgba(235, 1, 41, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.text-glow {
+  text-shadow: 0 0 40px rgba(28, 105, 212, 0.55);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 32px rgba(235, 1, 41, 0.45);
+}
+
+.accent-line {
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--bmw-dark-blue), var(--bmw-blue) 35%, var(--bmw-red) 65%, var(--bmw-blue-light));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.75; }
+}
+
+@keyframes scroll-indicator {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-scroll-indicator { animation: scroll-indicator 1.5s ease-in-out infinite; }
+.animate-marquee { animation: marquee 30s linear infinite; }
+
+.section-padding { @apply px-4 sm:px-6 lg:px-8 py-20 lg:py-28; }
+.container-custom { @apply max-w-7xl mx-auto; }
+
+.leaflet-container { background: var(--bmw-navy) !important; font-family: inherit; }
+.leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+  color: white !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--glass-border) !important;
+}
+.leaflet-popup-tip { background: rgba(255, 255, 255, 0.1) !important; }

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="128" fill="#0E1E36"/>
+  <circle cx="256" cy="256" r="180" fill="#1C69D4"/>
+  <circle cx="256" cy="256" r="140" fill="#0B1F3A"/>
+  <rect x="156" y="248" width="200" height="8" rx="4" fill="#EB0129"/>
+  <rect x="156" y="264" width="200" height="8" rx="4" fill="#4D9FFF"/>
+  <text x="256" y="230" text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="bold" font-size="72">BMW</text>
+</svg>

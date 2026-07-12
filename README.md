@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BMW Club Uganda
+
+Premium web application for **BMW Club Uganda** — the official digital home for BMW enthusiasts across Uganda.
+
+## Tech Stack
+
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS 4**
+- **Framer Motion** — page and component animations
+- **GSAP** — available for advanced animations
+- **React Query** — data fetching layer (ready for backend integration)
+- **Leaflet** — interactive maps for routes and locations
+- **Lucide React** — icons
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Description |
+|-------|-------------|
+| `/` | Cinematic homepage with all sections |
+| `/about` | Club mission and story |
+| `/members` | Searchable member directory (150 members) |
+| `/members/[id]` | Member profile pages |
+| `/events` | Events calendar with upcoming/past views |
+| `/events/[id]` | Event detail with countdown |
+| `/garages` | Partner garage directory (30 garages) |
+| `/marketplace` | Buy/sell listings (50 items) |
+| `/marketplace/[id]` | Listing detail |
+| `/routes` | Interactive driving routes map |
+| `/gallery` | Masonry photo gallery (300 photos) |
+| `/forum` | Community discussions (150 posts) |
+| `/partners` | Sponsors and partners |
+| `/contact` | Contact form |
+| `/login` | Member login |
+| `/join` | Membership application |
+| `/dashboard` | Member dashboard with QR pass |
+| `/shop` | Official club merchandise |
+| `/admin` | Admin management dashboard |
 
-## Learn More
+## Mock Data
 
-To learn more about Next.js, take a look at the following resources:
+All content is populated with realistic Ugandan mock data:
+- 150 members across 14 districts
+- 80 BMW vehicles
+- 30 partner garages
+- 50 marketplace listings
+- 25 driving routes
+- 30 events
+- 300 gallery photos
+- 150 forum discussions
+- 20 partner businesses
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Design
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Dark luxury aesthetic (Matte Black `#0B0B0B`, BMW Blue `#0066B1`)
+- Glassmorphism, carbon textures, metallic gradients
+- Particle backgrounds, mouse glow effects
+- Framer Motion animations throughout
+- Fully responsive
+- PWA manifest included
 
-## Deploy on Vercel
+## Production Build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run build
+npm start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Next Steps
+
+- Connect Firebase/Supabase for authentication
+- Integrate Cloudinary for image uploads
+- Add Google Maps API key for enhanced maps
+- Wire up backend API for live data

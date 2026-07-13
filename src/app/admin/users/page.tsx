@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { AdminButton, AdminField, adminInput } from "@/components/admin/AdminUi";
 
-type Permission = "view" | "add" | "update" | "all";
+type Permission = "view" | "add" | "update" | "all" | "blogger";
 type User = {
   id: string;
   name: string;
@@ -17,6 +17,7 @@ const PERMS: { value: Permission; label: string; help: string }[] = [
   { value: "view", label: "View", help: "Read-only access" },
   { value: "add", label: "Add", help: "View + create content" },
   { value: "update", label: "Update", help: "View + create + edit" },
+  { value: "blogger", label: "Blogger", help: "Post blog updates, photos & stories only" },
   { value: "all", label: "All", help: "Full access including delete & users" },
 ];
 

@@ -42,7 +42,10 @@ Master password always has **All** access. Staff accounts created in **Admin →
 - **View** — read only
 - **Add** — view + create
 - **Update** — view + create + edit
+- **Blogger** — create blog posts (updates, stories, photos, videos) only
 - **All** — full access including delete and staff management
+
+Public blog: `/blog` with likes and comments. Manage posts in **Admin → Blog**. Create blogger accounts under **Staff Users** with the Blogger permission.
 
 Activity for staff actions is listed under **Admin → Activity**. Slideshow cars (up to 10 photos each) are managed under **Admin → Slideshow Cars**.
 

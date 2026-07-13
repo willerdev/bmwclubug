@@ -3,14 +3,18 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Activity, Calendar, Car, GalleryVerticalEnd, Home, Image as ImageIcon, LayoutDashboard,
+  Activity, BookOpen, Calendar, Car, GalleryVerticalEnd, Home, Image as ImageIcon, LayoutDashboard,
   LogOut, Settings, Shield, ShoppingBag, Store, UserCog, Users, Wrench,
 } from "lucide-react";
 import { ClubLogo } from "@/components/ui/ClubLogo";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
-const NAV = [
+type Perm = "view" | "add" | "update" | "all" | "blogger";
+
+const FULL_NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/blog", label: "Blog", icon: BookOpen },
   { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/cars", label: "Slideshow Cars", icon: Car },
   { href: "/admin/partners", label: "Partners", icon: Store },
@@ -23,11 +27,32 @@ const NAV = [
   { href: "/admin/users", label: "Staff Users", icon: UserCog },
   { href: "/admin/activity", label: "Activity", icon: Activity },
   { href: "/admin/settings", label: "Hero & Settings", icon: Settings },
-];
+] as const;
+
+const BLOGGER_NAV = [
+  { href: "/admin/blog", label: "My Blog Posts", icon: BookOpen },
+  { href: "/admin/media", label: "Media", icon: ImageIcon },
+] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [permission, setPermission] = useState<Perm | null>(null);
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/login")
+      .then((r) => r.json())
+      .then((data) => {
+        const perm = data.user?.permission as Perm | undefined;
+        setPermission(perm ?? null);
+        setName(data.user?.name || data.user?.email || "");
+        if (perm === "blogger" && pathname === "/admin") {
+          router.replace("/admin/blog");
+        }
+      })
+      .catch(() => undefined);
+  }, [pathname, router]);
 
   const logout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -35,12 +60,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.refresh();
   };
 
+  const nav = permission === "blogger" ? BLOGGER_NAV : FULL_NAV;
+
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       <aside className="hidden lg:flex w-64 flex-col border-r border-white/10 glass-frosted sticky top-0 h-screen">
         <div className="p-5 border-b border-white/10 space-y-3">
           <ClubLogo size="sm" />
-          <p className="text-xs text-bmw-blue-light tracking-widest uppercase">Admin CMS</p>
+          <p className="text-xs text-bmw-blue-light tracking-widest uppercase">
+            {permission === "blogger" ? "Blogger CMS" : "Admin CMS"}
+          </p>
+          {name && <p className="text-xs text-white/45 truncate">{name}</p>}
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm glass-panel border border-bmw-blue/30 text-white hover:bg-white/10 w-full justify-center"
@@ -49,7 +79,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {NAV.map(({ href, label, icon: Icon }) => {
+          {nav.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
             return (
               <Link
@@ -67,6 +97,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="p-3 border-t border-white/10 space-y-2">
+          <Link href="/blog" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5">
+            <BookOpen size={16} /> View blog
+          </Link>
           <Link
             href="/"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm glass-panel border border-bmw-blue/25 text-white hover:bg-white/10"
@@ -90,7 +123,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="lg:hidden overflow-x-auto border-b border-white/10 px-3 py-2 flex gap-2">
-          {NAV.map(({ href, label }) => (
+          {nav.map(({ href, label }) => (
             <Link
               key={href}
               href={href}

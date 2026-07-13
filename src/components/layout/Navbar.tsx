@@ -8,6 +8,7 @@ import {
   Camera,
   Car,
   ChevronDown,
+  BookOpen,
   Home,
   Info,
   Map,
@@ -29,6 +30,7 @@ const DESKTOP_LINKS = [
   { href: "/about", label: "About" },
   { href: "/members", label: "Members" },
   { href: "/events", label: "Events" },
+  { href: "/blog", label: "Blog" },
   { href: "/garages", label: "Garages" },
   { href: "/gallery", label: "Gallery" },
   { href: "/partners", label: "Partners" },
@@ -55,10 +57,10 @@ const MOBILE_MENU = [
   {
     title: "Explore",
     links: [
+      { href: "/blog", label: "Blog", icon: BookOpen },
       { href: "/garages", label: "Garages", icon: Wrench },
       { href: "/gallery", label: "Gallery", icon: Camera },
       { href: "/partners", label: "Partners", icon: Store },
-      { href: "/contact", label: "Contact", icon: Phone },
     ],
   },
   {
@@ -68,6 +70,7 @@ const MOBILE_MENU = [
       { href: "/routes", label: "Routes", icon: Map },
       { href: "/forum", label: "Forum", icon: MessageSquare },
       { href: "/shop", label: "Club Shop", icon: Car },
+      { href: "/contact", label: "Contact", icon: Phone },
     ],
   },
 ] as const;

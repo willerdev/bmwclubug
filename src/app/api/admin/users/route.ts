@@ -4,7 +4,7 @@ import { logActivity } from "@/lib/activity";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
 
-const PERMS: AdminPermission[] = ["view", "add", "update", "all"];
+const PERMS: AdminPermission[] = ["view", "add", "update", "all", "blogger"];
 
 function mapUser(row: Record<string, unknown>) {
   return {

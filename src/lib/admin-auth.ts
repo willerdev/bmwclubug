@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 export const COOKIE_NAME = "bmw_admin_session";
 export const MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
-export type AdminPermission = "view" | "add" | "update" | "all";
+export type AdminPermission = "view" | "add" | "update" | "all" | "blogger";
 
 export type AdminSession = {
   type: "master" | "user";
@@ -14,12 +14,26 @@ export type AdminSession = {
   permission: AdminPermission;
 };
 
-const PERM_RANK: Record<AdminPermission, number> = {
+const PERM_RANK: Record<Exclude<AdminPermission, "blogger">, number> = {
   view: 1,
   add: 2,
   update: 3,
   all: 4,
 };
+
+export function canManageBlog(session: AdminSession) {
+  return (
+    session.type === "master" ||
+    session.permission === "blogger" ||
+    session.permission === "add" ||
+    session.permission === "update" ||
+    session.permission === "all"
+  );
+}
+
+export function isBloggerOnly(session: AdminSession) {
+  return session.type === "user" && session.permission === "blogger";
+}
 
 function getSecret() {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -51,7 +65,7 @@ function decodePayload(payload: string): AdminSession | null {
       n?: string;
       p?: string;
     };
-    const permission = (["view", "add", "update", "all"].includes(String(data.p))
+    const permission = (["view", "add", "update", "all", "blogger"].includes(String(data.p))
       ? data.p
       : "view") as AdminPermission;
     if (data.t === "m") {
@@ -76,6 +90,13 @@ function decodePayload(payload: string): AdminSession | null {
 }
 
 export function hasPermission(current: AdminPermission, required: AdminPermission) {
+  if (required === "blogger") {
+    return current === "blogger" || current === "add" || current === "update" || current === "all";
+  }
+  if (current === "blogger") {
+    // Bloggers only get blog access unless explicitly checking blogger
+    return false;
+  }
   return PERM_RANK[current] >= PERM_RANK[required];
 }
 
@@ -193,6 +214,20 @@ export async function requireAdminSession(min: AdminPermission = "view") {
     return {
       session: null as AdminSession | null,
       error: Response.json({ error: "Forbidden: insufficient permission" }, { status: 403 }),
+    };
+  }
+  return { session, error: null as Response | null };
+}
+
+export async function requireBlogSession() {
+  const session = await getAdminSession();
+  if (!session) {
+    return { session: null as AdminSession | null, error: Response.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+  if (!canManageBlog(session)) {
+    return {
+      session: null as AdminSession | null,
+      error: Response.json({ error: "Forbidden: blogger access required" }, { status: 403 }),
     };
   }
   return { session, error: null as Response | null };

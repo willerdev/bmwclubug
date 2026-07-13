@@ -1,11 +1,15 @@
 import { NextRequest } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { canManageBlog, getAdminSession, requireAdmin } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
 
 export async function GET() {
   const unauthorized = await requireAdmin("view");
-  if (unauthorized) return unauthorized;
+  if (unauthorized) {
+    // Allow bloggers to list media too
+    const session = await getAdminSession();
+    if (!session || !canManageBlog(session)) return unauthorized;
+  }
   try {
     const sql = getSql();
     const rows = await sql`
@@ -27,8 +31,10 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const unauthorized = await requireAdmin("add");
-  if (unauthorized) return unauthorized;
+  const session = await getAdminSession();
+  if (!session || !canManageBlog(session)) {
+    return jsonError("Forbidden: upload permission required", 403);
+  }
   try {
     const form = await req.formData();
     const file = form.get("file");

@@ -6,7 +6,7 @@ import { jsonError, jsonOk } from "@/lib/api-helpers";
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function PUT(req: NextRequest, ctx: Ctx) {
-  const unauthorized = await requireAdmin();
+  const unauthorized = await requireAdmin("update");
   if (unauthorized) return unauthorized;
   try {
     const { id } = await ctx.params;
@@ -30,7 +30,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
 }
 
 export async function DELETE(_req: NextRequest, ctx: Ctx) {
-  const unauthorized = await requireAdmin();
+  const unauthorized = await requireAdmin("all");
   if (unauthorized) return unauthorized;
   try {
     const { id } = await ctx.params;

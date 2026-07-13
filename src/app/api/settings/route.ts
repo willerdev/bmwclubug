@@ -19,7 +19,7 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  const unauthorized = await requireAdmin();
+  const unauthorized = await requireAdmin("update");
   if (unauthorized) return unauthorized;
   try {
     const body = await req.json();

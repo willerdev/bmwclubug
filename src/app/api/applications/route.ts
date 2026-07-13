@@ -4,7 +4,7 @@ import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
-  const unauthorized = await requireAdmin();
+  const unauthorized = await requireAdmin("view");
   if (unauthorized) return unauthorized;
   try {
     const status = req.nextUrl.searchParams.get("status");

@@ -15,7 +15,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const unauthorized = await requireAdmin();
+  const unauthorized = await requireAdmin("add");
   if (unauthorized) return unauthorized;
   try {
     const body = await req.json();

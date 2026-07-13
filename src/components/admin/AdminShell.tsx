@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Calendar, GalleryVerticalEnd, Home, Image as ImageIcon, LayoutDashboard,
-  LogOut, Settings, Shield, ShoppingBag, Store, Users, Wrench,
+  Activity, Calendar, Car, GalleryVerticalEnd, Home, Image as ImageIcon, LayoutDashboard,
+  LogOut, Settings, Shield, ShoppingBag, Store, UserCog, Users, Wrench,
 } from "lucide-react";
 import { ClubLogo } from "@/components/ui/ClubLogo";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/events", label: "Events", icon: Calendar },
+  { href: "/admin/cars", label: "Slideshow Cars", icon: Car },
   { href: "/admin/partners", label: "Partners", icon: Store },
   { href: "/admin/garages", label: "Garages", icon: Wrench },
   { href: "/admin/products", label: "Products", icon: ShoppingBag },
@@ -19,6 +20,8 @@ const NAV = [
   { href: "/admin/members", label: "Members", icon: Users },
   { href: "/admin/gallery", label: "Gallery", icon: GalleryVerticalEnd },
   { href: "/admin/media", label: "Media", icon: ImageIcon },
+  { href: "/admin/users", label: "Staff Users", icon: UserCog },
+  { href: "/admin/activity", label: "Activity", icon: Activity },
   { href: "/admin/settings", label: "Hero & Settings", icon: Settings },
 ];
 

@@ -32,8 +32,19 @@ Required for local development and **Render**:
 | Variable | Purpose |
 |----------|---------|
 | `DATABASE_URL` | Neon Postgres connection string (`sslmode=require`) |
-| `ADMIN_PASSWORD` | Shared password for `/admin` login |
+| `ADMIN_PASSWORD` | Master admin password (full access; used when email is blank) |
 | `ADMIN_SESSION_SECRET` | Long random string used to sign the admin session cookie |
+
+### Staff permissions
+
+Master password always has **All** access. Staff accounts created in **Admin → Staff Users** can have:
+
+- **View** — read only
+- **Add** — view + create
+- **Update** — view + create + edit
+- **All** — full access including delete and staff management
+
+Activity for staff actions is listed under **Admin → Activity**. Slideshow cars (up to 10 photos each) are managed under **Admin → Slideshow Cars**.
 
 On Render: leave **Root Directory** empty, set the three env vars on the Web Service, then redeploy. After deploy, open `/admin/login` with the shared password.
 

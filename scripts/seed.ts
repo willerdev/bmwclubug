@@ -1,7 +1,7 @@
 import { getSql } from "@/lib/db";
 import { LOCAL_IMAGES } from "@/lib/constants";
 import { buildRealMembers } from "@/data/mock/realMembers";
-import { events, partners, garages, shopProducts, galleryItems } from "@/data/mock";
+import { bmwModels, events, partners, garages, shopProducts, galleryItems } from "@/data/mock";
 
 async function seed() {
   const sql = getSql();
@@ -133,6 +133,35 @@ async function seed() {
       )
     `;
     console.log("Seeded settings");
+  }
+
+  const [{ count: carCount }] = await sql`SELECT COUNT(*)::int AS count FROM slide_cars`;
+  if (carCount === 0) {
+    for (let i = 0; i < bmwModels.length; i++) {
+      const model = bmwModels[i];
+      const rows = await sql`
+        INSERT INTO slide_cars (
+          name, generation, year, engine, horsepower, owner, description, sort_order, is_published
+        ) VALUES (
+          ${model.name},
+          ${model.generation},
+          ${model.year},
+          ${model.engine},
+          ${model.horsepower},
+          ${model.owner},
+          ${""},
+          ${i},
+          ${true}
+        )
+        RETURNING id
+      `;
+      const carId = String(rows[0].id);
+      await sql`
+        INSERT INTO slide_car_images (car_id, image_url, sort_order)
+        VALUES (${carId}, ${model.image}, ${0})
+      `;
+    }
+    console.log("Seeded slideshow cars");
   }
 
   console.log("Seed complete");

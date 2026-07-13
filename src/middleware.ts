@@ -29,12 +29,24 @@ function timingSafeEqualHex(a: string, b: string): boolean {
 
 async function isValidSession(token: string | undefined, secret: string | undefined) {
   if (!token || !secret) return false;
-  const [issuedAt, signature] = token.split(".");
-  if (!issuedAt || !signature) return false;
-  const expected = await hmacHex(secret, issuedAt);
-  if (!timingSafeEqualHex(signature, expected)) return false;
-  const age = Date.now() - Number(issuedAt);
-  return Number.isFinite(age) && age >= 0 && age < MAX_AGE_SECONDS * 1000;
+  const parts = token.split(".");
+  if (parts.length === 2) {
+    const [issuedAt, signature] = parts;
+    if (!issuedAt || !signature) return false;
+    const expected = await hmacHex(secret, issuedAt);
+    if (!timingSafeEqualHex(signature, expected)) return false;
+    const age = Date.now() - Number(issuedAt);
+    return Number.isFinite(age) && age >= 0 && age < MAX_AGE_SECONDS * 1000;
+  }
+  if (parts.length === 3) {
+    const [issuedAt, payload, signature] = parts;
+    if (!issuedAt || !payload || !signature) return false;
+    const expected = await hmacHex(secret, `${issuedAt}.${payload}`);
+    if (!timingSafeEqualHex(signature, expected)) return false;
+    const age = Date.now() - Number(issuedAt);
+    return Number.isFinite(age) && age >= 0 && age < MAX_AGE_SECONDS * 1000;
+  }
+  return false;
 }
 
 export async function middleware(req: NextRequest) {

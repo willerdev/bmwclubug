@@ -15,7 +15,7 @@ import type {
   Vehicle,
 } from "@/types";
 import { BMW_IMAGES, LOCAL_IMAGES, MEMBERSHIP_LEVELS, UGANDAN_DISTRICTS } from "@/lib/constants";
-import { buildRealMembers, REAL_MEMBER_COUNT } from "./realMembers";
+import { buildRealMembers } from "./realMembers";
 
 const FIRST_NAMES = [
   "James", "Sarah", "David", "Grace", "Peter", "Mary", "John", "Ruth",

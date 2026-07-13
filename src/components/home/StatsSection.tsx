@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
-import { clubStats } from "@/data/mock";
+import type { ClubStats } from "@/types";
 import { motion } from "framer-motion";
 
 /** Official club figures (kept in sync with live Neon counts where available). */
-const REAL_STATS = {
+const REAL_STATS: ClubStats = {
   members: 45,
   registeredBMWs: 30,
   eventsHosted: 12,
   partnerGarages: 12,
   roadTripsCompleted: 25,
   citiesRepresented: 14,
-} as const;
+};
 
 const STATS = [
   { key: "members" as const, label: "Members" },
@@ -25,7 +25,7 @@ const STATS = [
 ];
 
 export function StatsSection() {
-  const [stats, setStats] = useState({ ...clubStats, ...REAL_STATS });
+  const [stats, setStats] = useState<ClubStats>(REAL_STATS);
 
   useEffect(() => {
     Promise.all([

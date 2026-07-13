@@ -14,7 +14,7 @@ export function Hero() {
     hero_image?: { url?: string };
   }>("/api/settings", {});
   const heroSrc = settings.hero_image?.url || LOCAL_IMAGES.hero;
-  const [memberCount, setMemberCount] = useState(30);
+  const [memberCount, setMemberCount] = useState(45);
 
   useEffect(() => {
     fetch("/api/members")

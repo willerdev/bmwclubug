@@ -5,6 +5,16 @@ import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { clubStats } from "@/data/mock";
 import { motion } from "framer-motion";
 
+/** Official club figures (kept in sync with live Neon counts where available). */
+const REAL_STATS = {
+  members: 45,
+  registeredBMWs: 30,
+  eventsHosted: 12,
+  partnerGarages: 12,
+  roadTripsCompleted: 25,
+  citiesRepresented: 14,
+} as const;
+
 const STATS = [
   { key: "members" as const, label: "Members" },
   { key: "registeredBMWs" as const, label: "Registered BMWs" },
@@ -15,7 +25,7 @@ const STATS = [
 ];
 
 export function StatsSection() {
-  const [stats, setStats] = useState(clubStats);
+  const [stats, setStats] = useState({ ...clubStats, ...REAL_STATS });
 
   useEffect(() => {
     Promise.all([
@@ -23,12 +33,14 @@ export function StatsSection() {
       fetch("/api/events").then((r) => r.json()).catch(() => null),
       fetch("/api/garages").then((r) => r.json()).catch(() => null),
     ]).then(([members, events, garages]) => {
-      setStats((prev) => ({
-        ...prev,
-        members: Array.isArray(members) ? members.length : prev.members,
-        eventsHosted: Array.isArray(events) ? events.length : prev.eventsHosted,
-        partnerGarages: Array.isArray(garages) ? garages.length : prev.partnerGarages,
-      }));
+      setStats({
+        members: Array.isArray(members) && members.length ? members.length : REAL_STATS.members,
+        registeredBMWs: REAL_STATS.registeredBMWs,
+        eventsHosted: Array.isArray(events) && events.length ? events.length : REAL_STATS.eventsHosted,
+        partnerGarages: Array.isArray(garages) && garages.length ? garages.length : REAL_STATS.partnerGarages,
+        roadTripsCompleted: REAL_STATS.roadTripsCompleted,
+        citiesRepresented: REAL_STATS.citiesRepresented,
+      });
     });
   }, []);
 

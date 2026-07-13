@@ -429,10 +429,10 @@ export const shopProducts: ShopProduct[] = [
 ];
 
 export const clubStats: ClubStats = {
-  members: REAL_MEMBER_COUNT,
-  registeredBMWs: REAL_MEMBER_COUNT,
-  eventsHosted: 30,
-  partnerGarages: 30,
+  members: 45,
+  registeredBMWs: 30,
+  eventsHosted: 12,
+  partnerGarages: 12,
   roadTripsCompleted: 25,
   citiesRepresented: 14,
 };

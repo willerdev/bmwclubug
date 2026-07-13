@@ -1,16 +1,15 @@
+"use client";
+
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { partners } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { Partner } from "@/types";
 import { SponsorsSection } from "@/components/home/SponsorsSection";
 import Image from "next/image";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Partners",
-  description: "Our sponsors and partners supporting BMW Club Uganda.",
-};
 
 export default function PartnersPage() {
+  const { data: partners } = useApiList<Partner>("/api/partners");
+
   return (
     <>
       <PageHeader

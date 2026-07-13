@@ -218,13 +218,50 @@ export default function JoinPage() {
     setStep((s) => Math.min(3, s + 1));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const message = validateStep(3);
     if (message) {
       setError(message);
       return;
     }
-    setSubmitted(true);
+    setError("");
+    try {
+      const payload = {
+        email: form.email,
+        fullName: form.fullName,
+        phone: form.phone,
+        address: form.address,
+        occupation: form.occupation,
+        organisation: form.organisation,
+        position: form.position,
+        ownerPhotoName: form.ownerPhoto?.name ?? null,
+        bmwModel: form.bmwModel,
+        yearOfManufacture: form.yearOfManufacture,
+        engine: form.engine,
+        plateNumber: form.plateNumber,
+        vehiclePhotoNames: form.vehiclePhotos.map((f) => f.name),
+        modifications: form.modifications,
+        modificationOther: form.modificationOther,
+        hearAbout: form.hearAbout,
+        hearAboutOther: form.hearAboutOther,
+        interests: form.interests,
+        pledge: form.pledge,
+        signature: form.signature,
+        joinDate: form.joinDate,
+      };
+      const res = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to submit application");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to submit application");
+    }
   };
 
   return (

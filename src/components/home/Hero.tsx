@@ -1,23 +1,40 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { ScrollIndicator } from "@/components/effects/ScrollIndicator";
 import { LOCAL_IMAGES } from "@/lib/constants";
-import { REAL_MEMBER_COUNT } from "@/data/mock/realMembers";
+import { useApiObject } from "@/hooks/useApiData";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 
 export function Hero() {
+  const { data: settings } = useApiObject<{
+    hero_image?: { url?: string };
+  }>("/api/settings", {});
+  const heroSrc = settings.hero_image?.url || LOCAL_IMAGES.hero;
+  const [memberCount, setMemberCount] = useState(30);
+
+  useEffect(() => {
+    fetch("/api/members")
+      .then((r) => r.json())
+      .then((list) => {
+        if (Array.isArray(list)) setMemberCount(list.length);
+      })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <section className="relative min-h-[100svh] h-[100svh] flex items-end sm:items-center justify-center overflow-hidden">
       <Image
-        src={LOCAL_IMAGES.hero}
+        src={heroSrc}
         alt="BMW Club Uganda members"
         fill
         priority
         className="object-cover object-[center_35%] sm:object-center opacity-80 sm:opacity-70"
         sizes="100vw"
+        unoptimized={heroSrc.startsWith("/api/media")}
       />
 
       <div className="absolute inset-0 bg-gradient-to-b from-bmw-navy/55 via-bmw-dark-blue/35 to-background sm:from-bmw-navy/70 sm:via-bmw-dark-blue/50 sm:to-background/95" />
@@ -100,7 +117,7 @@ export function Hero() {
           className="mt-6 sm:mt-10 flex items-center justify-center gap-2 text-white/55 text-xs sm:text-sm glass-frosted px-4 py-2 rounded-full w-fit mx-auto"
         >
           <MapPin size={13} className="text-bmw-red" />
-          Kampala &bull; {REAL_MEMBER_COUNT} Members
+          Kampala &bull; {memberCount} Members
         </motion.div>
       </div>
 

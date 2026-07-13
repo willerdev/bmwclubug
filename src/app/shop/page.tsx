@@ -3,11 +3,14 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { shopProducts } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { ShopProduct } from "@/types";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
 export default function ShopPage() {
+  const { data: shopProducts } = useApiList<ShopProduct>("/api/products");
+
   return (
     <>
       <PageHeader

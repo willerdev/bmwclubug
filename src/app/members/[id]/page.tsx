@@ -1,32 +1,48 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { getMemberById, members } from "@/data/mock";
+import { fetchMemberById, fetchMembers } from "@/lib/public-data";
 import { Award, Globe, MapPin, Share2 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 export async function generateStaticParams() {
-  return members.map((m) => ({ id: m.id }));
+  try {
+    const members = await fetchMembers();
+    return members.map((m) => ({ id: String(m.id) }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const member = getMemberById(id);
-  if (!member) return { title: "Member Not Found" };
-  return { title: member.name, description: member.bio };
+  try {
+    const member = await fetchMemberById(id);
+    if (!member) return { title: "Member Not Found" };
+    return { title: member.name, description: member.bio };
+  } catch {
+    return { title: "Member" };
+  }
 }
 
 export default async function MemberProfilePage({ params }: Props) {
   const { id } = await params;
-  const member = getMemberById(id);
+  const member = await fetchMemberById(id);
   if (!member) notFound();
+
+  const cars = member.cars ?? [];
+  const badges = member.badges ?? [];
+  const awards = member.awards ?? [];
+  const gallery = member.gallery ?? [];
+  const social = member.social ?? {};
 
   return (
     <>
@@ -46,12 +62,12 @@ export default async function MemberProfilePage({ params }: Props) {
                   <MapPin size={14} /> {member.district}
                 </p>
                 <div className="flex justify-center gap-3 mt-4">
-                  {member.social.instagram && (
+                  {social.instagram && (
                     <a href="#" className="w-10 h-10 glass rounded-full flex items-center justify-center hover:text-bmw-blue transition-colors">
                       <Globe size={18} />
                     </a>
                   )}
-                  {member.social.twitter && (
+                  {social.twitter && (
                     <a href="#" className="w-10 h-10 glass rounded-full flex items-center justify-center hover:text-bmw-blue transition-colors">
                       <Share2 size={18} />
                     </a>
@@ -64,7 +80,7 @@ export default async function MemberProfilePage({ params }: Props) {
                       <div className="text-xs text-white/40">Years in Club</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-bmw-blue">{member.cars.length}</div>
+                      <div className="text-2xl font-bold text-bmw-blue">{cars.length}</div>
                       <div className="text-xs text-white/40">BMWs Owned</div>
                     </div>
                   </div>
@@ -81,7 +97,7 @@ export default async function MemberProfilePage({ params }: Props) {
               <GlassCard>
                 <h3 className="font-bold text-lg mb-3">Cars Owned</h3>
                 <div className="flex flex-wrap gap-2">
-                  {member.cars.map((car) => (
+                  {cars.map((car) => (
                     <span key={car} className="glass px-4 py-2 rounded-full text-sm">{car}</span>
                   ))}
                 </div>
@@ -90,7 +106,7 @@ export default async function MemberProfilePage({ params }: Props) {
               <GlassCard>
                 <h3 className="font-bold text-lg mb-3">Badges & Awards</h3>
                 <div className="flex flex-wrap gap-2">
-                  {[...member.badges, ...member.awards].map((badge) => (
+                  {[...badges, ...awards].map((badge) => (
                     <span key={badge} className="flex items-center gap-1 glass px-3 py-1.5 rounded-full text-sm">
                       <Award size={14} className="text-bmw-blue" /> {badge}
                     </span>
@@ -103,16 +119,18 @@ export default async function MemberProfilePage({ params }: Props) {
                 <p className="text-white/70">{member.favoriteRoute}</p>
               </GlassCard>
 
-              <GlassCard>
-                <h3 className="font-bold text-lg mb-3">Photo Gallery</h3>
-                <div className="grid grid-cols-3 gap-3">
-                  {member.gallery.map((img, i) => (
-                    <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
-                      <Image src={img} alt="" fill className="object-cover" sizes="200px" />
-                    </div>
-                  ))}
-                </div>
-              </GlassCard>
+              {gallery.length > 0 && (
+                <GlassCard>
+                  <h3 className="font-bold text-lg mb-3">Photo Gallery</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    {gallery.map((img, i) => (
+                      <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
+                        <Image src={img} alt="" fill className="object-cover" sizes="200px" />
+                      </div>
+                    ))}
+                  </div>
+                </GlassCard>
+              )}
             </div>
           </div>
 

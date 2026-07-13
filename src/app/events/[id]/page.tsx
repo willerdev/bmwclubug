@@ -1,34 +1,48 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { getEventById, events } from "@/data/mock";
+import { fetchEventById, fetchEvents } from "@/lib/public-data";
 import { formatDate, getCountdown } from "@/lib/utils";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 export async function generateStaticParams() {
-  return events.slice(0, 10).map((e) => ({ id: e.id }));
+  try {
+    const events = await fetchEvents();
+    return events.slice(0, 20).map((e) => ({ id: String(e.id) }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const event = getEventById(id);
-  if (!event) return { title: "Event Not Found" };
-  return { title: event.title, description: event.description };
+  try {
+    const event = await fetchEventById(id);
+    if (!event) return { title: "Event Not Found" };
+    return { title: event.title, description: event.description };
+  } catch {
+    return { title: "Event" };
+  }
 }
 
 export default async function EventDetailPage({ params }: Props) {
   const { id } = await params;
-  const event = getEventById(id);
+  const event = await fetchEventById(id);
   if (!event) notFound();
 
   const countdown = getCountdown(event.date);
+  const gallery = event.gallery?.length ? event.gallery : [event.poster].filter(Boolean);
+  const lat = event.location?.lat ?? 0.3476;
+  const lng = event.location?.lng ?? 32.5825;
 
   return (
     <>
@@ -50,7 +64,7 @@ export default async function EventDetailPage({ params }: Props) {
               <GlassCard>
                 <h3 className="font-bold text-lg mb-3">Event Gallery</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {event.gallery.map((img, i) => (
+                  {gallery.map((img, i) => (
                     <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
                       <Image src={img} alt="" fill className="object-cover" sizes="200px" />
                     </div>
@@ -93,7 +107,7 @@ export default async function EventDetailPage({ params }: Props) {
               <GlassCard>
                 <h3 className="font-bold text-lg mb-3">Location</h3>
                 <div className="aspect-video rounded-xl bg-carbon flex items-center justify-center text-white/30 text-sm">
-                  Map: {event.location.lat.toFixed(2)}, {event.location.lng.toFixed(2)}
+                  Map: {lat.toFixed(2)}, {lng.toFixed(2)}
                 </div>
               </GlassCard>
             </div>

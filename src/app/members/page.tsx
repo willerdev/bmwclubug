@@ -3,7 +3,8 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { members } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { Member } from "@/types";
 import { MEMBERSHIP_LEVELS, UGANDAN_DISTRICTS } from "@/lib/constants";
 import { motion } from "framer-motion";
 import { Award, MapPin, Search } from "lucide-react";
@@ -12,6 +13,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 export default function MembersPage() {
+  const { data: members } = useApiList<Member>("/api/members");
   const [search, setSearch] = useState("");
   const [district, setDistrict] = useState("");
   const [level, setLevel] = useState("");
@@ -22,13 +24,13 @@ export default function MembersPage() {
       const matchSearch =
         !search ||
         m.name.toLowerCase().includes(search.toLowerCase()) ||
-        m.cars.some((c) => c.toLowerCase().includes(search.toLowerCase()));
+        (m.cars ?? []).some((c) => c.toLowerCase().includes(search.toLowerCase()));
       const matchDistrict = !district || m.district === district;
       const matchLevel = !level || m.membershipLevel === level;
-      const matchGen = !generation || m.cars.some((c) => c.includes(generation));
+      const matchGen = !generation || (m.cars ?? []).some((c) => c.includes(generation));
       return matchSearch && matchDistrict && matchLevel && matchGen;
     });
-  }, [search, district, level, generation]);
+  }, [members, search, district, level, generation]);
 
   return (
     <>
@@ -108,7 +110,7 @@ export default function MembersPage() {
                       <div className="min-w-0">
                         <h3 className="font-bold truncate group-hover:text-bmw-blue transition-colors">{member.name}</h3>
                         <p className="text-xs text-bmw-blue">{member.membershipLevel}</p>
-                        <p className="text-xs text-white/50 truncate mt-1">{member.cars.join(", ")}</p>
+                        <p className="text-xs text-white/50 truncate mt-1">{(member.cars ?? []).join(", ")}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mt-3 text-xs text-white/40">

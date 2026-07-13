@@ -1,10 +1,14 @@
 "use client";
 
+"use client";
+
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { partners } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { Partner } from "@/types";
 import Image from "next/image";
 
 export function SponsorsSection() {
+  const { data: partners } = useApiList<Partner>("/api/partners");
   const doubled = [...partners, ...partners];
 
   return (

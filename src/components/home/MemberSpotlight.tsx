@@ -2,17 +2,25 @@
 
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { members } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { Member } from "@/types";
 import { motion } from "framer-motion";
 import { Award, MapPin, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export function MemberSpotlight() {
-  const spotlight = members.filter((m) =>
-    ["Founder", "Club Ambassador", "Premium Member"].includes(m.membershipLevel) ||
-    m.rank === "President" || m.rank === "Partner Garage" || m.rank === "Partner Business"
-  ).slice(0, 6);
+  const { data: members } = useApiList<Member>("/api/members");
+  const spotlight = members
+    .filter(
+      (m) =>
+        ["Founder", "Club Ambassador", "Premium Member"].includes(m.membershipLevel) ||
+        m.rank === "President" ||
+        m.rank === "Partner Garage" ||
+        m.rank === "Partner Business"
+    )
+    .slice(0, 6);
+  const display = spotlight.length > 0 ? spotlight : members.slice(0, 6);
 
   return (
     <section className="section-padding relative">
@@ -24,7 +32,7 @@ export function MemberSpotlight() {
         />
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {spotlight.map((member, i) => (
+          {display.map((member, i) => (
             <motion.div
               key={member.id}
               initial={{ opacity: 0, y: 30 }}
@@ -48,13 +56,13 @@ export function MemberSpotlight() {
                   </div>
                   <h3 className="font-bold text-lg group-hover:text-bmw-blue transition-colors">{member.name}</h3>
                   <p className="text-bmw-blue text-sm mt-1">{member.membershipLevel}</p>
-                  <p className="text-white/60 text-sm mt-2">{member.cars[0]}</p>
+                  <p className="text-white/60 text-sm mt-2">{(member.cars ?? [])[0]}</p>
                   <div className="flex items-center justify-center gap-1 mt-2 text-xs text-white/40">
                     <Award size={12} />
                     {member.yearsInClub} years in club
                   </div>
                   <div className="flex flex-wrap justify-center gap-1 mt-3">
-                    {member.badges.slice(0, 3).map((badge) => (
+                    {(member.badges ?? []).slice(0, 3).map((badge) => (
                       <span key={badge} className="text-[10px] glass px-2 py-0.5 rounded-full text-white/60">
                         {badge}
                       </span>

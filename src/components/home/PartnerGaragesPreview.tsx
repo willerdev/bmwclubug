@@ -3,13 +3,15 @@
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { garages } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { Garage } from "@/types";
 import { motion } from "framer-motion";
-import { Clock, Mail, MapPin, Phone, Star } from "lucide-react";
+import { Clock, MapPin, Phone, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export function PartnerGaragesPreview() {
+  const { data: garages } = useApiList<Garage>("/api/garages");
   const featured = garages.slice(0, 6);
 
   return (
@@ -53,7 +55,7 @@ export function PartnerGaragesPreview() {
                       <MapPin size={12} /> {garage.district}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-3">
-                      {garage.services.slice(0, 3).map((s) => (
+                      {(garage.services ?? []).slice(0, 3).map((s) => (
                         <span key={s} className="text-[10px] glass px-2 py-0.5 rounded-full text-white/50">{s}</span>
                       ))}
                     </div>

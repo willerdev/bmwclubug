@@ -2,12 +2,14 @@
 
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { galleryItems } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { GalleryItem } from "@/types";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
 export function GalleryPreview() {
+  const { data: galleryItems } = useApiList<GalleryItem>("/api/gallery");
   const preview = galleryItems.slice(0, 12);
 
   return (

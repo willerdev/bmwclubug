@@ -3,13 +3,15 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { garages } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { Garage } from "@/types";
 import { motion } from "framer-motion";
 import { Clock, Mail, MapPin, Phone, Search, Star } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
 export default function GaragesPage() {
+  const { data: garages } = useApiList<Garage>("/api/garages");
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -19,9 +21,9 @@ export default function GaragesPage() {
       (g) =>
         g.name.toLowerCase().includes(q) ||
         g.district.toLowerCase().includes(q) ||
-        g.services.some((s) => s.toLowerCase().includes(q))
+        (g.services ?? []).some((s) => s.toLowerCase().includes(q))
     );
-  }, [search]);
+  }, [garages, search]);
 
   return (
     <>
@@ -71,7 +73,7 @@ export default function GaragesPage() {
                       <MapPin size={12} /> {garage.location}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-3">
-                      {garage.services.map((s) => (
+                      {(garage.services ?? []).map((s) => (
                         <span key={s} className="text-[10px] glass px-2 py-0.5 rounded-full text-white/50">{s}</span>
                       ))}
                     </div>

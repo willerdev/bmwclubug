@@ -4,12 +4,21 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { CLUB_CONTACT } from "@/lib/constants";
+import { useApiObject } from "@/hooks/useApiData";
 import { motion } from "framer-motion";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { useState } from "react";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const { data: settings } = useApiObject<{
+    contact?: { phone?: string; email?: string; location?: string };
+  }>("/api/settings", {});
+  const contact = {
+    phone: settings.contact?.phone || CLUB_CONTACT.phone,
+    email: settings.contact?.email || CLUB_CONTACT.email,
+    location: settings.contact?.location || CLUB_CONTACT.location,
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,21 +64,21 @@ export default function ContactPage() {
                     <div className="w-12 h-12 glass rounded-xl flex items-center justify-center"><MapPin size={20} className="text-bmw-blue" /></div>
                     <div>
                       <p className="font-medium">Location</p>
-                      <p className="text-sm text-white/50">{CLUB_CONTACT.location}</p>
+                      <p className="text-sm text-white/50">{contact.location}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 glass rounded-xl flex items-center justify-center"><Phone size={20} className="text-bmw-blue" /></div>
                     <div>
                       <p className="font-medium">Phone</p>
-                      <p className="text-sm text-white/50">{CLUB_CONTACT.phone}</p>
+                      <p className="text-sm text-white/50">{contact.phone}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 glass rounded-xl flex items-center justify-center"><Mail size={20} className="text-bmw-blue" /></div>
                     <div>
                       <p className="font-medium">Email</p>
-                      <p className="text-sm text-white/50">{CLUB_CONTACT.email}</p>
+                      <p className="text-sm text-white/50">{contact.email}</p>
                     </div>
                   </div>
                 </div>

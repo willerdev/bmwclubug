@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
 import { clubStats } from "@/data/mock";
 import { motion } from "framer-motion";
@@ -14,6 +15,23 @@ const STATS = [
 ];
 
 export function StatsSection() {
+  const [stats, setStats] = useState(clubStats);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/members").then((r) => r.json()).catch(() => null),
+      fetch("/api/events").then((r) => r.json()).catch(() => null),
+      fetch("/api/garages").then((r) => r.json()).catch(() => null),
+    ]).then(([members, events, garages]) => {
+      setStats((prev) => ({
+        ...prev,
+        members: Array.isArray(members) ? members.length : prev.members,
+        eventsHosted: Array.isArray(events) ? events.length : prev.eventsHosted,
+        partnerGarages: Array.isArray(garages) ? garages.length : prev.partnerGarages,
+      }));
+    });
+  }, []);
+
   return (
     <section className="section-padding relative">
       <div className="absolute inset-0 bmw-gradient opacity-5" />
@@ -28,7 +46,7 @@ export function StatsSection() {
             {STATS.map((stat) => (
               <AnimatedCounter
                 key={stat.key}
-                value={clubStats[stat.key]}
+                value={stats[stat.key]}
                 label={stat.label}
               />
             ))}

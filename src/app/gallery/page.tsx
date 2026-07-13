@@ -1,7 +1,8 @@
 "use client";
 
 import { PageHeader } from "@/components/ui/PageHeader";
-import { galleryItems } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { GalleryItem } from "@/types";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useMemo, useState } from "react";
@@ -9,12 +10,13 @@ import { useMemo, useState } from "react";
 const CATEGORIES = ["All", "Events", "Cars", "Road Trips", "Members", "Videos"] as const;
 
 export default function GalleryPage() {
+  const { data: galleryItems } = useApiList<GalleryItem>("/api/gallery");
   const [category, setCategory] = useState<string>("All");
 
   const filtered = useMemo(() => {
     if (category === "All") return galleryItems;
     return galleryItems.filter((item) => item.category === category);
-  }, [category]);
+  }, [galleryItems, category]);
 
   return (
     <>

@@ -3,12 +3,15 @@
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { shopProducts } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { ShopProduct } from "@/types";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
 export function ShopPreview() {
+  const { data: shopProducts } = useApiList<ShopProduct>("/api/products");
+
   return (
     <section className="section-padding relative">
       <div className="container-custom">

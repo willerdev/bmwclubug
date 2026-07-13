@@ -3,7 +3,8 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { events } from "@/data/mock";
+import { useApiList } from "@/hooks/useApiData";
+import type { Event } from "@/types";
 import { formatDate, getCountdown } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
@@ -25,6 +26,7 @@ function Countdown({ date }: { date: string }) {
 }
 
 export default function EventsPage() {
+  const { data: events } = useApiList<Event>("/api/events");
   const [tab, setTab] = useState<"upcoming" | "past" | "calendar">("upcoming");
   const upcoming = events.filter((e) => e.status === "upcoming");
   const past = events.filter((e) => e.status === "past");

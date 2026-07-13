@@ -8,8 +8,8 @@ Premium web application for **BMW Club Uganda** — the official digital home fo
 - **TypeScript**
 - **Tailwind CSS 4**
 - **Framer Motion** — page and component animations
-- **GSAP** — available for advanced animations
-- **React Query** — data fetching layer (ready for backend integration)
+- **Neon Postgres** — CMS content and join applications
+- **React Query** — client data fetching
 - **Leaflet** — interactive maps for routes and locations
 - **Lucide React** — icons
 
@@ -17,56 +17,70 @@ Premium web application for **BMW Club Uganda** — the official digital home fo
 
 ```bash
 npm install
+cp .env.example .env.local
+# Fill DATABASE_URL, ADMIN_PASSWORD, ADMIN_SESSION_SECRET
+npm run seed   # optional: load initial content into Neon
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Admin CMS: [http://localhost:3000/admin/login](http://localhost:3000/admin/login).
+
+## Environment variables
+
+Required for local development and **Render**:
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | Neon Postgres connection string (`sslmode=require`) |
+| `ADMIN_PASSWORD` | Shared password for `/admin` login |
+| `ADMIN_SESSION_SECRET` | Long random string used to sign the admin session cookie |
+
+On Render: leave **Root Directory** empty, set the three env vars on the Web Service, then redeploy. After deploy, open `/admin/login` with the shared password.
+
+## Admin CMS
+
+Password-protected CMS at `/admin` backed by Neon:
+
+- Events, partners, garages, shop products
+- Join applications (approve / reject)
+- Public member directory profiles
+- Gallery and media library (uploads stored in Neon, served at `/api/media/[id]`)
+- Hero image and contact overrides
+
+Seed script (uses mock/real content as the initial dataset):
+
+```bash
+npm run seed
+```
 
 ## Pages
 
 | Route | Description |
 |-------|-------------|
-| `/` | Cinematic homepage with all sections |
+| `/` | Homepage (live events, shop, members, gallery, etc.) |
 | `/about` | Club mission and story |
-| `/members` | Searchable member directory (150 members) |
-| `/members/[id]` | Member profile pages |
-| `/events` | Events calendar with upcoming/past views |
-| `/events/[id]` | Event detail with countdown |
-| `/garages` | Partner garage directory (30 garages) |
-| `/marketplace` | Buy/sell listings (50 items) |
-| `/marketplace/[id]` | Listing detail |
-| `/routes` | Interactive driving routes map |
-| `/gallery` | Masonry photo gallery (300 photos) |
-| `/forum` | Community discussions (150 posts) |
+| `/members` | Member directory (from Neon) |
+| `/members/[id]` | Member profile |
+| `/events` | Events calendar |
+| `/events/[id]` | Event detail |
+| `/garages` | Partner garage directory |
+| `/marketplace` | Buy/sell listings |
+| `/routes` | Driving routes map |
+| `/gallery` | Photo gallery |
+| `/forum` | Community discussions |
 | `/partners` | Sponsors and partners |
 | `/contact` | Contact form |
-| `/login` | Member login |
-| `/join` | Membership application |
-| `/dashboard` | Member dashboard with QR pass |
-| `/shop` | Official club merchandise |
-| `/admin` | Admin management dashboard |
-
-## Mock Data
-
-All content is populated with realistic Ugandan mock data:
-- 150 members across 14 districts
-- 80 BMW vehicles
-- 30 partner garages
-- 50 marketplace listings
-- 25 driving routes
-- 30 events
-- 300 gallery photos
-- 150 forum discussions
-- 20 partner businesses
+| `/join` | Membership application → `POST /api/applications` |
+| `/shop` | Club merchandise |
+| `/admin` | Admin CMS |
+| `/admin/login` | Admin password login |
 
 ## Design
 
-- Dark luxury aesthetic (Matte Black `#0B0B0B`, BMW Blue `#0066B1`)
+- Dark luxury aesthetic (Matte Black `#0B0B0B`, BMW Blue `#1C69D4`, M Red `#EB0129`)
 - Glassmorphism, carbon textures, metallic gradients
-- Particle backgrounds, mouse glow effects
 - Framer Motion animations throughout
 - Fully responsive
-- PWA manifest included
 
 ## Production Build
 
@@ -74,10 +88,3 @@ All content is populated with realistic Ugandan mock data:
 npm run build
 npm start
 ```
-
-## Next Steps
-
-- Connect Firebase/Supabase for authentication
-- Integrate Cloudinary for image uploads
-- Add Google Maps API key for enhanced maps
-- Wire up backend API for live data

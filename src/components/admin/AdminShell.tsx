@@ -38,9 +38,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       <aside className="hidden lg:flex w-64 flex-col border-r border-white/10 glass-frosted sticky top-0 h-screen">
-        <div className="p-5 border-b border-white/10">
+        <div className="p-5 border-b border-white/10 space-y-3">
           <ClubLogo size="sm" />
-          <p className="text-xs text-bmw-blue-light mt-3 tracking-widest uppercase">Admin CMS</p>
+          <p className="text-xs text-bmw-blue-light tracking-widest uppercase">Admin CMS</p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm glass-panel border border-bmw-blue/30 text-white hover:bg-white/10 w-full justify-center"
+          >
+            <Home size={15} className="text-bmw-blue-light" /> Home
+          </Link>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {NAV.map(({ href, label, icon: Icon }) => {
@@ -61,8 +67,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
         <div className="p-3 border-t border-white/10 space-y-2">
-          <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5">
-            <Home size={16} /> View site
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm glass-panel border border-bmw-blue/25 text-white hover:bg-white/10"
+          >
+            <Home size={16} className="text-bmw-blue-light" /> Home
           </Link>
           <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/60 hover:bg-white/5">
             <LogOut size={16} /> Logout
@@ -71,9 +80,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex-1 min-w-0">
-        <div className="lg:hidden sticky top-0 z-30 glass-strong border-b border-white/10 px-4 py-3 flex items-center justify-between">
+        <div className="lg:hidden sticky top-0 z-30 glass-strong border-b border-white/10 px-4 py-3 flex items-center justify-between gap-3">
           <ClubLogo size="sm" showText={false} />
-          <button onClick={logout} className="text-sm text-white/60">Logout</button>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-bmw-blue-light">
+              <Home size={14} /> Home
+            </Link>
+            <button onClick={logout} className="text-sm text-white/60">Logout</button>
+          </div>
         </div>
         <div className="lg:hidden overflow-x-auto border-b border-white/10 px-3 py-2 flex gap-2">
           {NAV.map(({ href, label }) => (

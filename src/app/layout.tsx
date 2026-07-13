@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { PublicChrome } from "@/components/layout/PublicChrome";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { AmbientBackground } from "@/components/effects/AmbientBackground";
 import { ParticleBackground } from "@/components/effects/ParticleBackground";
@@ -62,9 +61,7 @@ export default function RootLayout({
           <AmbientBackground />
           <ParticleBackground />
           <MouseGlow />
-          <Navbar />
-          <main className="relative z-10 w-full max-w-full overflow-x-clip">{children}</main>
-          <Footer />
+          <PublicChrome>{children}</PublicChrome>
         </QueryProvider>
       </body>
     </html>

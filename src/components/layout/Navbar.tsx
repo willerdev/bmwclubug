@@ -4,31 +4,85 @@ import { ClubLogo } from "@/components/ui/ClubLogo";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import {
+  Calendar,
+  Camera,
+  Car,
+  Home,
+  Info,
+  LogIn,
+  Map,
+  Menu,
+  MessageSquare,
+  Phone,
+  ShoppingBag,
+  Store,
+  Users,
+  Wrench,
+  X,
+  UserPlus,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+const MOBILE_MENU = [
+  {
+    title: "Discover",
+    links: [
+      { href: "/", label: "Home", icon: Home },
+      { href: "/about", label: "About", icon: Info },
+      { href: "/members", label: "Members", icon: Users },
+      { href: "/events", label: "Events", icon: Calendar },
+    ],
+  },
+  {
+    title: "Explore",
+    links: [
+      { href: "/garages", label: "Garages", icon: Wrench },
+      { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
+      { href: "/routes", label: "Routes", icon: Map },
+      { href: "/gallery", label: "Gallery", icon: Camera },
+    ],
+  },
+  {
+    title: "Community",
+    links: [
+      { href: "/forum", label: "Forum", icon: MessageSquare },
+      { href: "/partners", label: "Partners", icon: Store },
+      { href: "/shop", label: "Club Shop", icon: Car },
+      { href: "/contact", label: "Contact", icon: Phone },
+    ],
+  },
+] as const;
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   return (
     <>
       <motion.nav
-        initial={{ y: -100 }}
+        initial={{ y: -80 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.5 }}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-          scrolled
-            ? "glass-strong py-3 shadow-lg shadow-bmw-dark-blue/20 border-b border-white/10"
-            : "glass-frosted py-5 border-b border-white/5"
+          scrolled || mobileOpen
+            ? "glass-strong py-3 shadow-lg shadow-bmw-dark-blue/25 border-b border-white/10"
+            : "bg-gradient-to-b from-bmw-navy/80 to-transparent py-4 border-b border-transparent"
         )}
       >
         <div className="container-custom flex items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -63,11 +117,13 @@ export function Navbar() {
           </div>
 
           <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="xl:hidden p-2 text-white glass-frosted rounded-lg"
-            aria-label="Toggle menu"
+            onClick={() => setMobileOpen((open) => !open)}
+            className="xl:hidden inline-flex items-center gap-2 px-3 py-2 text-white glass-panel rounded-full border border-white/15"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
           >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+            <span className="text-xs font-medium tracking-wide">{mobileOpen ? "Close" : "Menu"}</span>
           </button>
         </div>
       </motion.nav>
@@ -75,42 +131,83 @@ export function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", damping: 25 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-40 xl:hidden"
           >
-            <div className="absolute inset-0 bg-bmw-navy/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-            <div className="absolute right-0 top-0 bottom-0 w-80 glass-strong p-6 pt-24 overflow-y-auto border-l border-white/15">
-              <div className="bmw-m-stripe h-1 w-full rounded-full mb-6 opacity-70" />
-              <div className="flex flex-col gap-1">
-                {NAV_LINKS.map((link, i) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    <Link
-                      href={link.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="block px-4 py-3 text-white/80 hover:text-white glass-frosted rounded-xl mb-1 hover:border-white/20 transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
-                <div className="border-t border-white/10 mt-4 pt-4 flex flex-col gap-2">
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-center text-white/70 glass-frosted rounded-xl">
-                    Login
-                  </Link>
-                  <Link href="/join" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-center glass-panel rounded-full font-medium border border-bmw-blue/30">
-                    Join Club
-                  </Link>
-                </div>
+            <button
+              className="absolute inset-0 bg-bmw-navy/70 backdrop-blur-md"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu overlay"
+            />
+
+            <motion.div
+              initial={{ y: -24, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -16, opacity: 0 }}
+              transition={{ type: "spring", damping: 24, stiffness: 220 }}
+              className="absolute top-[4.5rem] left-3 right-3 bottom-3 glass-strong rounded-3xl border border-white/15 overflow-hidden flex flex-col"
+            >
+              <div className="bmw-m-stripe h-1 w-full opacity-80" />
+              <div className="px-5 pt-5 pb-3">
+                <p className="text-xs uppercase tracking-[0.25em] text-bmw-blue-light">BMW Club Uganda</p>
+                <h2 className="text-xl font-bold mt-1">Menu</h2>
               </div>
-            </div>
+
+              <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-5">
+                {MOBILE_MENU.map((group, groupIndex) => (
+                  <div key={group.title}>
+                    <p className="text-[11px] uppercase tracking-widest text-white/40 px-2 mb-2">
+                      {group.title}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {group.links.map((link, i) => {
+                        const Icon = link.icon;
+                        return (
+                          <motion.div
+                            key={link.href}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: groupIndex * 0.08 + i * 0.04 }}
+                          >
+                            <Link
+                              href={link.href}
+                              onClick={() => setMobileOpen(false)}
+                              className="flex items-center gap-3 glass-frosted rounded-2xl px-3 py-3 border border-white/10 active:scale-[0.98] transition-transform"
+                            >
+                              <span className="w-9 h-9 rounded-xl glass-panel flex items-center justify-center text-bmw-blue-light shrink-0">
+                                <Icon size={16} />
+                              </span>
+                              <span className="text-sm font-medium text-white/90">{link.label}</span>
+                            </Link>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 border-t border-white/10 grid grid-cols-2 gap-3">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center gap-2 px-4 py-3 text-sm glass-frosted rounded-full border border-white/10"
+                >
+                  <LogIn size={16} />
+                  Login
+                </Link>
+                <Link
+                  href="/join"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center gap-2 px-4 py-3 text-sm glass-panel rounded-full font-medium border border-bmw-blue/30 glow-blue"
+                >
+                  <UserPlus size={16} />
+                  Join
+                </Link>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -49,9 +49,6 @@ export function Footer() {
               <li>
                 <Link href="/shop" className="text-sm text-white/50 hover:text-bmw-blue-light transition-colors">Club Shop</Link>
               </li>
-              <li>
-                <Link href="/dashboard" className="text-sm text-white/50 hover:text-bmw-blue-light transition-colors">Dashboard</Link>
-              </li>
             </ul>
           </div>
 

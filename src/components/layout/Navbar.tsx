@@ -1,16 +1,15 @@
 "use client";
 
 import { ClubLogo } from "@/components/ui/ClubLogo";
-import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Calendar,
   Camera,
   Car,
+  ChevronDown,
   Home,
   Info,
-  LogIn,
   Map,
   Menu,
   MessageSquare,
@@ -23,7 +22,25 @@ import {
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const DESKTOP_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/members", label: "Members" },
+  { href: "/events", label: "Events" },
+  { href: "/garages", label: "Garages" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/partners", label: "Partners" },
+  { href: "/contact", label: "Contact" },
+] as const;
+
+const MORE_LINKS = [
+  { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
+  { href: "/routes", label: "Routes", icon: Map },
+  { href: "/forum", label: "Forum", icon: MessageSquare },
+  { href: "/shop", label: "Club Shop", icon: Car },
+] as const;
 
 const MOBILE_MENU = [
   {
@@ -39,21 +56,93 @@ const MOBILE_MENU = [
     title: "Explore",
     links: [
       { href: "/garages", label: "Garages", icon: Wrench },
-      { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
-      { href: "/routes", label: "Routes", icon: Map },
       { href: "/gallery", label: "Gallery", icon: Camera },
-    ],
-  },
-  {
-    title: "Community",
-    links: [
-      { href: "/forum", label: "Forum", icon: MessageSquare },
       { href: "/partners", label: "Partners", icon: Store },
-      { href: "/shop", label: "Club Shop", icon: Car },
       { href: "/contact", label: "Contact", icon: Phone },
     ],
   },
+  {
+    title: "More",
+    links: [
+      { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
+      { href: "/routes", label: "Routes", icon: Map },
+      { href: "/forum", label: "Forum", icon: MessageSquare },
+      { href: "/shop", label: "Club Shop", icon: Car },
+    ],
+  },
 ] as const;
+
+function MoreDropdown() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="px-3 py-2 text-sm text-white/70 hover:text-white transition-colors relative group rounded-lg hover:bg-white/5 inline-flex items-center gap-1"
+        aria-expanded={open}
+        aria-haspopup="menu"
+      >
+        More
+        <ChevronDown size={14} className={cn("transition-transform", open && "rotate-180")} />
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 accent-line transition-all group-hover:w-3/4 rounded-full" />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.15 }}
+            role="menu"
+            className="absolute top-full left-0 pt-2 min-w-[200px]"
+          >
+            <div className="glass-strong rounded-2xl border border-white/15 p-2 shadow-xl shadow-bmw-dark-blue/30">
+              {MORE_LINKS.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    role="menuitem"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/75 hover:text-white hover:bg-white/8 transition-colors"
+                  >
+                    <Icon size={15} className="text-bmw-blue-light shrink-0" />
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -88,8 +177,8 @@ export function Navbar() {
         <div className="container-custom flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 w-full max-w-full">
           <ClubLogo size="sm" />
 
-          <div className="hidden xl:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
+          <div className="hidden xl:flex items-center gap-0.5">
+            {DESKTOP_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -99,15 +188,10 @@ export function Navbar() {
                 <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 accent-line transition-all group-hover:w-3/4 rounded-full" />
               </Link>
             ))}
+            <MoreDropdown />
           </div>
 
           <div className="hidden xl:flex items-center gap-3">
-            <Link
-              href="/login"
-              className="px-4 py-2 text-sm text-white/70 hover:text-white glass-frosted rounded-full border border-white/10 hover:border-white/20 transition-all"
-            >
-              Login
-            </Link>
             <Link
               href="/join"
               className="px-5 py-2.5 text-sm glass-panel rounded-full font-medium glow-blue hover:bg-white/10 border border-bmw-blue/30 transition-all"
@@ -189,22 +273,14 @@ export function Navbar() {
                 ))}
               </div>
 
-              <div className="p-4 border-t border-white/10 grid grid-cols-2 gap-3">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 px-4 py-3 text-sm glass-frosted rounded-full border border-white/10"
-                >
-                  <LogIn size={16} />
-                  Login
-                </Link>
+              <div className="p-4 border-t border-white/10">
                 <Link
                   href="/join"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-2 px-4 py-3 text-sm glass-panel rounded-full font-medium border border-bmw-blue/30 glow-blue"
+                  className="flex items-center justify-center gap-2 px-4 py-3 text-sm glass-panel rounded-full font-medium border border-bmw-blue/30 glow-blue w-full"
                 >
                   <UserPlus size={16} />
-                  Join
+                  Join Club
                 </Link>
               </div>
             </motion.div>

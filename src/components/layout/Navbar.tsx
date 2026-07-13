@@ -79,13 +79,13 @@ export function Navbar() {
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+          "fixed top-0 left-0 right-0 z-50 w-full max-w-full transition-all duration-500",
           scrolled || mobileOpen
             ? "glass-strong py-3 shadow-lg shadow-bmw-dark-blue/25 border-b border-white/10"
             : "bg-gradient-to-b from-bmw-navy/80 to-transparent py-4 border-b border-transparent"
         )}
       >
-        <div className="container-custom flex items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="container-custom flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 w-full max-w-full">
           <ClubLogo size="sm" />
 
           <div className="hidden xl:flex items-center gap-1">

@@ -51,7 +51,7 @@ export function ModelsCarousel() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
-                className="snap-start shrink-0 w-80"
+                className="snap-start shrink-0 w-[min(20rem,calc(100vw-2rem))]"
               >
                 <GlassCard className="p-0 overflow-hidden h-full">
                   <div className="relative h-48 overflow-hidden">

@@ -46,6 +46,8 @@ export const viewport: Viewport = {
   themeColor: "#0E1E36",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -55,13 +57,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen w-full max-w-full overflow-x-clip bg-background text-foreground antialiased">
         <QueryProvider>
           <AmbientBackground />
           <ParticleBackground />
           <MouseGlow />
           <Navbar />
-          <main className="relative z-10">{children}</main>
+          <main className="relative z-10 w-full max-w-full overflow-x-clip">{children}</main>
           <Footer />
         </QueryProvider>
       </body>

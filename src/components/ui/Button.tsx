@@ -49,8 +49,12 @@ export function Button({
 
   if (href) {
     return (
-      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-        <Link href={href} className={classes}>
+      <motion.div
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.98 }}
+        className={cn("inline-flex max-w-full", className?.includes("w-full") && "w-full")}
+      >
+        <Link href={href} className={cn(classes, className?.includes("w-full") && "w-full")}>
           {children}
         </Link>
       </motion.div>

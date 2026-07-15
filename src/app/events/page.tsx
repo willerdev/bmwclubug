@@ -3,27 +3,15 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
+import { LiveCountdown } from "@/components/ui/LiveCountdown";
 import { useApiList } from "@/hooks/useApiData";
 import type { Event } from "@/types";
-import { formatDate, getCountdown } from "@/lib/utils";
+import { cn, formatDate, isEventUrgent } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-function Countdown({ date }: { date: string }) {
-  const [time, setTime] = useState(getCountdown(date));
-  useEffect(() => {
-    const t = setInterval(() => setTime(getCountdown(date)), 1000);
-    return () => clearInterval(t);
-  }, [date]);
-  return (
-    <span className="text-bmw-blue font-mono text-sm">
-      {time.days}d {time.hours}h {time.minutes}m
-    </span>
-  );
-}
+import { useState } from "react";
 
 export default function EventsPage() {
   const { data: events } = useApiList<Event>("/api/events");
@@ -57,7 +45,9 @@ export default function EventsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayEvents.map((event, i) => (
+            {displayEvents.map((event, i) => {
+              const urgent = event.status === "upcoming" && isEventUrgent(event.date, event.time);
+              return (
               <motion.div
                 key={event.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -65,12 +55,19 @@ export default function EventsPage() {
                 transition={{ delay: (i % 9) * 0.05 }}
               >
                 <Link href={`/events/${event.id}`}>
-                  <GlassCard className="p-0 overflow-hidden group h-full">
+                  <GlassCard className={cn("p-0 overflow-hidden group h-full", urgent && "event-urgent")}>
                     <div className="relative h-48 overflow-hidden">
-                      <Image src={event.poster} alt={event.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="400px" />
+                      <Image
+                        src={event.poster}
+                        alt={event.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="400px"
+                        unoptimized={event.poster.startsWith("/api/media")}
+                      />
                       {event.status === "upcoming" && (
                         <div className="absolute top-3 right-3 glass px-3 py-1 rounded-full text-xs">
-                          <Countdown date={event.date} />
+                          <LiveCountdown date={event.date} time={event.time} />
                         </div>
                       )}
                       {event.status === "past" && (
@@ -86,13 +83,14 @@ export default function EventsPage() {
                         <div className="flex items-center gap-2"><Users size={14} className="text-bmw-blue" />{event.registeredCount}/{event.maxCapacity}</div>
                       </div>
                       {event.status === "upcoming" && (
-                        <Button variant="primary" size="sm" className="mt-4 w-full">Register</Button>
+                        <Button href={`/events/${event.id}`} variant="primary" size="sm" className="mt-4 w-full">Register</Button>
                       )}
                     </div>
                   </GlassCard>
                 </Link>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

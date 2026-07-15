@@ -8,9 +8,10 @@ import type { Member } from "@/types";
 import { MEMBERSHIP_LEVELS, UGANDAN_DISTRICTS } from "@/lib/constants";
 import { motion } from "framer-motion";
 import { Award, MapPin, Search } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { MemberPhoto } from "@/components/members/MemberPhoto";
+import { formatMemberTenure } from "@/lib/utils";
 
 export default function MembersPage() {
   const { data: members } = useApiList<Member>("/api/members");
@@ -99,11 +100,10 @@ export default function MembersPage() {
                   <GlassCard className="group h-full">
                     <div className="flex items-center gap-4">
                       <div className="relative w-16 h-16 shrink-0">
-                        <Image
+                        <MemberPhoto
                           src={member.photo}
                           alt={member.name}
-                          fill
-                          className="rounded-full object-cover ring-2 ring-bmw-blue/20 group-hover:ring-bmw-blue transition-all"
+                          className="rounded-full ring-2 ring-bmw-blue/20 group-hover:ring-bmw-blue transition-all"
                           sizes="64px"
                         />
                       </div>
@@ -115,7 +115,7 @@ export default function MembersPage() {
                     </div>
                     <div className="flex items-center gap-2 mt-3 text-xs text-white/40">
                       <MapPin size={10} /> {member.district}
-                      <Award size={10} className="ml-auto" /> {member.yearsInClub}y
+                      <Award size={10} className="ml-auto" /> {formatMemberTenure(member.joinedAt).short}
                     </div>
                   </GlassCard>
                 </Link>

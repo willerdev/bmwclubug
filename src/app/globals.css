@@ -177,6 +177,50 @@ main {
 .animate-scroll-indicator { animation: scroll-indicator 1.5s ease-in-out infinite; }
 .animate-marquee { animation: marquee 30s linear infinite; }
 
+@keyframes event-urgent-border {
+  0% {
+    border-color: rgba(28, 105, 212, 0.85);
+    box-shadow: 0 0 0 1px rgba(28, 105, 212, 0.45), 0 0 28px rgba(28, 105, 212, 0.35);
+  }
+  33% {
+    border-color: rgba(235, 1, 41, 0.9);
+    box-shadow: 0 0 0 1px rgba(235, 1, 41, 0.5), 0 0 32px rgba(235, 1, 41, 0.4);
+  }
+  66% {
+    border-color: rgba(106, 177, 255, 0.9);
+    box-shadow: 0 0 0 1px rgba(106, 177, 255, 0.5), 0 0 30px rgba(106, 177, 255, 0.35);
+  }
+  100% {
+    border-color: rgba(28, 105, 212, 0.85);
+    box-shadow: 0 0 0 1px rgba(28, 105, 212, 0.45), 0 0 28px rgba(28, 105, 212, 0.35);
+  }
+}
+
+.event-urgent {
+  position: relative;
+  border-width: 2px !important;
+  border-style: solid !important;
+  animation: event-urgent-border 3s ease-in-out infinite;
+}
+
+.event-urgent::after {
+  content: "Soon";
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 5;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(235, 1, 41, 0.55);
+  color: #fff;
+  pointer-events: none;
+}
+
 .section-padding { @apply px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full max-w-full; }
 .container-custom { @apply max-w-7xl mx-auto w-full; }
 

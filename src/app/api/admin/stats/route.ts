@@ -13,6 +13,7 @@ export async function GET() {
     const [products] = await sql`SELECT COUNT(*)::int AS count FROM products`;
     const [members] = await sql`SELECT COUNT(*)::int AS count FROM members`;
     const [applications] = await sql`SELECT COUNT(*)::int AS count FROM applications WHERE status = 'pending'`;
+    const [eventRegs] = await sql`SELECT COUNT(*)::int AS count FROM event_registrations WHERE status = 'pending'`;
     const [gallery] = await sql`SELECT COUNT(*)::int AS count FROM gallery_items`;
     return jsonOk({
       events: events.count,
@@ -21,6 +22,7 @@ export async function GET() {
       products: products.count,
       members: members.count,
       pendingApplications: applications.count,
+      pendingEventRegistrations: eventRegs.count,
       gallery: gallery.count,
     });
   } catch (error) {

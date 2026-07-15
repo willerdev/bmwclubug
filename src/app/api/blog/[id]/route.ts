@@ -4,6 +4,7 @@ import { logActivity } from "@/lib/activity";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
 import { getPostByIdOrSlug, mapBlogPost } from "@/lib/blog";
+import { MAX_BLOG_IMAGES } from "@/lib/media-limits";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -41,7 +42,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     if (!title) return jsonError("Title is required");
 
     const mediaUrls = Array.isArray(body.mediaUrls)
-      ? body.mediaUrls.map(String).filter(Boolean).slice(0, 12)
+      ? body.mediaUrls.map(String).filter(Boolean).slice(0, MAX_BLOG_IMAGES)
       : existing.mediaUrls;
     const postType = ["update", "story", "photo", "video"].includes(body.postType)
       ? body.postType

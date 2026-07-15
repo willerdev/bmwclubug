@@ -1,8 +1,9 @@
 import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Button } from "@/components/ui/Button";
+import { LiveCountdown } from "@/components/ui/LiveCountdown";
+import { EventRegisterForm } from "@/components/events/EventRegisterForm";
 import { fetchEventById, fetchEvents } from "@/lib/public-data";
-import { formatDate, getCountdown } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -39,10 +40,11 @@ export default async function EventDetailPage({ params }: Props) {
   const event = await fetchEventById(id);
   if (!event) notFound();
 
-  const countdown = getCountdown(event.date);
   const gallery = event.gallery?.length ? event.gallery : [event.poster].filter(Boolean);
   const lat = event.location?.lat ?? 0.3476;
   const lng = event.location?.lng ?? 32.5825;
+  const spotsLeft =
+    event.maxCapacity > 0 ? Math.max(0, event.maxCapacity - event.registeredCount) : null;
 
   return (
     <>
@@ -53,7 +55,15 @@ export default async function EventDetailPage({ params }: Props) {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
               <div className="relative h-64 lg:h-96 rounded-2xl overflow-hidden">
-                <Image src={event.poster} alt={event.title} fill className="object-cover" sizes="800px" priority />
+                <Image
+                  src={event.poster}
+                  alt={event.title}
+                  fill
+                  className="object-cover"
+                  sizes="800px"
+                  priority
+                  unoptimized={event.poster.startsWith("/api/media")}
+                />
               </div>
 
               <GlassCard>
@@ -66,7 +76,14 @@ export default async function EventDetailPage({ params }: Props) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {gallery.map((img, i) => (
                     <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
-                      <Image src={img} alt="" fill className="object-cover" sizes="200px" />
+                      <Image
+                        src={img}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="200px"
+                        unoptimized={img.startsWith("/api/media")}
+                      />
                     </div>
                   ))}
                 </div>
@@ -77,30 +94,41 @@ export default async function EventDetailPage({ params }: Props) {
               <GlassCard>
                 <h3 className="font-bold text-lg mb-4">Event Details</h3>
                 <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-3"><Calendar size={16} className="text-bmw-blue" /><span>{formatDate(event.date)}</span></div>
-                  <div className="flex items-center gap-3"><Clock size={16} className="text-bmw-blue" /><span>{event.time}</span></div>
-                  <div className="flex items-center gap-3"><MapPin size={16} className="text-bmw-blue" /><span>{event.venue}, {event.district}</span></div>
-                  <div className="flex items-center gap-3"><Users size={16} className="text-bmw-blue" /><span>{event.registeredCount} / {event.maxCapacity} registered</span></div>
+                  <div className="flex items-center gap-3">
+                    <Calendar size={16} className="text-bmw-blue" />
+                    <span>{formatDate(event.date)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Clock size={16} className="text-bmw-blue" />
+                    <span>{event.time}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MapPin size={16} className="text-bmw-blue" />
+                    <span>
+                      {event.venue}, {event.district}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Users size={16} className="text-bmw-blue" />
+                    <span>
+                      {event.registeredCount} / {event.maxCapacity} registered
+                      {spotsLeft !== null ? ` · ${spotsLeft} spots left` : ""}
+                    </span>
+                  </div>
                 </div>
               </GlassCard>
 
               {event.status === "upcoming" && (
-                <GlassCard className="text-center">
-                  <h3 className="font-bold mb-4">Countdown</h3>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[
-                      { v: countdown.days, l: "Days" },
-                      { v: countdown.hours, l: "Hours" },
-                      { v: countdown.minutes, l: "Min" },
-                      { v: countdown.seconds, l: "Sec" },
-                    ].map((u) => (
-                      <div key={u.l}>
-                        <div className="text-2xl font-bold text-bmw-blue">{u.v}</div>
-                        <div className="text-[10px] text-white/40">{u.l}</div>
-                      </div>
-                    ))}
+                <GlassCard className="text-center space-y-4">
+                  <div>
+                    <h3 className="font-bold mb-4">Countdown</h3>
+                    <LiveCountdown date={event.date} time={event.time} variant="grid" />
                   </div>
-                  <Button className="mt-6 w-full">Register Now</Button>
+                  {spotsLeft === 0 ? (
+                    <p className="text-white/50 text-sm">This event is fully booked.</p>
+                  ) : (
+                    <EventRegisterForm eventId={event.id} eventTitle={event.title} />
+                  )}
                 </GlassCard>
               )}
 

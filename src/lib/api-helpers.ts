@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { GalleryItem, Member } from "@/types";
+import { yearsSinceJoined } from "@/lib/utils";
 
 export function jsonOk<T>(data: T, status = 200) {
   return NextResponse.json(data, { status });
@@ -65,7 +66,23 @@ export function mapProduct(row: Record<string, unknown>) {
   };
 }
 
+export function parseCsvOrArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map(String).map((s) => s.trim()).filter(Boolean);
+  }
+  return String(value ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export function mapMember(row: Record<string, unknown>) {
+  const joinedAt = row.joined_at
+    ? String(row.joined_at).slice(0, 10)
+    : row.created_at
+      ? String(row.created_at).slice(0, 10)
+      : "";
+
   return {
     id: String(row.id),
     name: String(row.name ?? ""),
@@ -74,17 +91,22 @@ export function mapMember(row: Record<string, unknown>) {
     bio: String(row.bio ?? ""),
     district: String(row.district ?? ""),
     membershipLevel: row.membership_level as Member["membershipLevel"],
-    yearsInClub: Number(row.years_in_club ?? 0),
+    joinedAt,
+    yearsInClub: yearsSinceJoined(joinedAt),
     rank: String(row.rank ?? ""),
     badges: Array.isArray(row.badges) ? row.badges.map(String) : [],
     favoriteRoute: String(row.favorite_route ?? ""),
     cars: Array.isArray(row.cars) ? row.cars.map(String) : [],
     garage: undefined as string | undefined,
-    social: {} as Member["social"],
+    social: {
+      instagram: String(row.social_instagram ?? "") || undefined,
+      twitter: String(row.social_twitter ?? "") || undefined,
+      facebook: String(row.social_facebook ?? "") || undefined,
+    } as Member["social"],
     friends: [] as string[],
-    awards: [] as string[],
+    awards: Array.isArray(row.awards) ? row.awards.map(String) : [],
     eventHistory: [] as string[],
-    gallery: [] as string[],
+    gallery: Array.isArray(row.gallery_urls) ? row.gallery_urls.map(String) : [],
   };
 }
 

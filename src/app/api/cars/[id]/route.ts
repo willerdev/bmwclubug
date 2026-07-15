@@ -3,6 +3,7 @@ import { requireAdminSession } from "@/lib/admin-auth";
 import { logActivity } from "@/lib/activity";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
+import { MAX_CAR_IMAGES } from "@/lib/media-limits";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -18,7 +19,7 @@ function mapCar(row: Record<string, unknown>, images: string[] = []) {
     description: String(row.description ?? ""),
     sortOrder: Number(row.sort_order ?? 0),
     isPublished: Boolean(row.is_published),
-    images: images.slice(0, 10),
+    images: images.slice(0, MAX_CAR_IMAGES),
     image: images[0] || "",
   };
 }
@@ -29,7 +30,7 @@ async function loadImages(carId: string) {
     SELECT image_url FROM slide_car_images
     WHERE car_id = ${carId}
     ORDER BY sort_order ASC, created_at ASC
-    LIMIT 10
+    LIMIT ${MAX_CAR_IMAGES}
   `;
   return rows.map((r) => String(r.image_url));
 }
@@ -54,7 +55,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     const { id } = await ctx.params;
     const body = await req.json();
     const images = Array.isArray(body.images)
-      ? body.images.map(String).filter(Boolean).slice(0, 10)
+      ? body.images.map(String).filter(Boolean).slice(0, MAX_CAR_IMAGES)
       : body.image
         ? [String(body.image)]
         : [];

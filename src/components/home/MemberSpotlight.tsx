@@ -6,8 +6,9 @@ import { useApiList } from "@/hooks/useApiData";
 import type { Member } from "@/types";
 import { motion } from "framer-motion";
 import { Award, MapPin, Star } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { MemberPhoto } from "@/components/members/MemberPhoto";
+import { formatMemberTenure } from "@/lib/utils";
 
 export function MemberSpotlight() {
   const { data: members } = useApiList<Member>("/api/members");
@@ -43,11 +44,10 @@ export function MemberSpotlight() {
               <Link href={`/members/${member.id}`}>
                 <GlassCard className="text-center group">
                   <div className="relative w-24 h-24 mx-auto mb-4">
-                    <Image
+                    <MemberPhoto
                       src={member.photo}
                       alt={member.name}
-                      fill
-                      className="rounded-full object-cover ring-2 ring-bmw-blue/30 group-hover:ring-bmw-blue transition-all"
+                      className="rounded-full ring-2 ring-bmw-blue/30 group-hover:ring-bmw-blue transition-all"
                       sizes="96px"
                     />
                     <div className="absolute -bottom-1 -right-1 w-8 h-8 glass-panel rounded-full flex items-center justify-center border border-bmw-red/30">
@@ -59,7 +59,7 @@ export function MemberSpotlight() {
                   <p className="text-white/60 text-sm mt-2">{(member.cars ?? [])[0]}</p>
                   <div className="flex items-center justify-center gap-1 mt-2 text-xs text-white/40">
                     <Award size={12} />
-                    {member.yearsInClub} years in club
+                    {formatMemberTenure(member.joinedAt).long}
                   </div>
                   <div className="flex flex-wrap justify-center gap-1 mt-3">
                     {(member.badges ?? []).slice(0, 3).map((badge) => (

@@ -36,8 +36,13 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   icons: {
-    icon: "/icon.jpeg",
-    apple: "/icon.jpeg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/images/club-logo.jpeg", sizes: "512x512", type: "image/jpeg" },
+    ],
+    apple: "/images/club-logo.jpeg",
+    shortcut: "/favicon.ico",
   },
 };
 

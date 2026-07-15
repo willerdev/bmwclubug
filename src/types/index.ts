@@ -14,6 +14,9 @@ export interface Member {
   bio: string;
   district: string;
   membershipLevel: MembershipLevel;
+  /** YYYY-MM-DD when the member registered / joined */
+  joinedAt: string;
+  /** Computed from joinedAt */
   yearsInClub: number;
   rank: string;
   badges: string[];

@@ -83,6 +83,12 @@ export type DbMember = {
   badges: string[];
   favorite_route: string;
   cars: string[];
+  joined_at: string;
+  social_instagram: string;
+  social_twitter: string;
+  social_facebook: string;
+  awards: string[];
+  gallery_urls: string[];
   created_at: string;
   updated_at: string;
 };

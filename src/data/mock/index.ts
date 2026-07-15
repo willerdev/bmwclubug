@@ -119,6 +119,7 @@ export function generateMembers(count = 150): Member[] {
       bio: `Passionate BMW enthusiast from ${pick(UGANDAN_DISTRICTS, i)}. ${numCars > 1 ? "Multi-BMW owner" : "Proud owner"} with ${Math.floor(rand() * 15) + 1} years of driving experience. Love exploring Uganda's scenic routes.`,
       district: pick(UGANDAN_DISTRICTS, i),
       membershipLevel: level,
+      joinedAt: new Date(Date.now() - (Math.floor(rand() * 8) + 1) * 365.25 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
       yearsInClub: Math.floor(rand() * 8) + 1,
       rank: level === "Founder" ? "Founding Member" : level === "Executive Committee" ? "Committee" : "Active Member",
       badges: Array.from({ length: 2 + Math.floor(rand() * 4) }, (_, j) => pick(BADGES, i + j)),

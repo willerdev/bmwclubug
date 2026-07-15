@@ -4,6 +4,7 @@ import { logActivity } from "@/lib/activity";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
 import { mapBlogPost, slugify } from "@/lib/blog";
+import { MAX_BLOG_IMAGES } from "@/lib/media-limits";
 
 export async function GET(req: NextRequest) {
   const adminAll = req.nextUrl.searchParams.get("all") === "1";
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
     }
 
     const mediaUrls = Array.isArray(body.mediaUrls)
-      ? body.mediaUrls.map(String).filter(Boolean).slice(0, 12)
+      ? body.mediaUrls.map(String).filter(Boolean).slice(0, MAX_BLOG_IMAGES)
       : [];
     const postType = ["update", "story", "photo", "video"].includes(body.postType)
       ? body.postType

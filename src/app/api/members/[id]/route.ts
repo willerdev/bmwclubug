@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
-import { jsonError, jsonOk, mapMember } from "@/lib/api-helpers";
+import { jsonError, jsonOk, mapMember, parseCsvOrArray } from "@/lib/api-helpers";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -25,13 +25,12 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     const { id } = await ctx.params;
     const body = await req.json();
     const sql = getSql();
-    const badges = Array.isArray(body.badges) ? body.badges.map(String) : [];
-    const cars = Array.isArray(body.cars)
-      ? body.cars.map(String)
-      : String(body.cars ?? "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
+    const badges = parseCsvOrArray(body.badges);
+    const awards = parseCsvOrArray(body.awards);
+    const cars = parseCsvOrArray(body.cars);
+    const gallery = parseCsvOrArray(body.gallery ?? body.gallery_urls);
+    const joinedAt = String(body.joinedAt ?? body.joined_at ?? "").slice(0, 10) || new Date().toISOString().slice(0, 10);
+
     const rows = await sql`
       UPDATE members SET
         name = ${String(body.name ?? "")},
@@ -40,11 +39,16 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
         bio = ${String(body.bio ?? "")},
         district = ${String(body.district ?? "")},
         membership_level = ${String(body.membershipLevel ?? body.membership_level ?? "Enthusiast")},
-        years_in_club = ${Number(body.yearsInClub ?? body.years_in_club ?? 1)},
         rank = ${String(body.rank ?? "Active Member")},
         badges = ${badges},
         favorite_route = ${String(body.favoriteRoute ?? body.favorite_route ?? "")},
         cars = ${cars},
+        joined_at = ${joinedAt},
+        social_instagram = ${String(body.social?.instagram ?? body.socialInstagram ?? body.social_instagram ?? "")},
+        social_twitter = ${String(body.social?.twitter ?? body.socialTwitter ?? body.social_twitter ?? "")},
+        social_facebook = ${String(body.social?.facebook ?? body.socialFacebook ?? body.social_facebook ?? "")},
+        awards = ${awards},
+        gallery_urls = ${gallery},
         updated_at = NOW()
       WHERE id = ${id}
       RETURNING *

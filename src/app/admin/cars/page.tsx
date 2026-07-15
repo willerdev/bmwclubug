@@ -5,6 +5,7 @@ import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ImagePicker } from "@/components/admin/ImagePicker";
 import { AdminButton, AdminField, adminInput } from "@/components/admin/AdminUi";
+import { MAX_CAR_IMAGES } from "@/lib/media-limits";
 
 type Car = {
   id: string;
@@ -52,8 +53,8 @@ export default function AdminCarsPage() {
 
   const addImage = () => {
     if (!draftImage.trim()) return;
-    if (form.images.length >= 10) {
-      setError("Maximum 10 pictures per car");
+    if (form.images.length >= MAX_CAR_IMAGES) {
+      setError(`Maximum ${MAX_CAR_IMAGES} pictures per car`);
       return;
     }
     if (form.images.includes(draftImage)) return;
@@ -69,7 +70,7 @@ export default function AdminCarsPage() {
       return;
     }
     if (form.images.length === 0) {
-      setError("Add at least one picture (up to 10)");
+      setError(`Add at least one picture (up to ${MAX_CAR_IMAGES})`);
       return;
     }
     const res = await fetch(editingId ? `/api/cars/${editingId}` : "/api/cars", {
@@ -93,7 +94,7 @@ export default function AdminCarsPage() {
       <div>
         <h1 className="text-3xl font-bold">Slideshow Cars</h1>
         <p className="text-white/50 mt-1 text-sm">
-          Add featured BMWs for the homepage carousel. Up to 10 pictures per car.
+          Add featured BMWs for the homepage carousel. Up to {MAX_CAR_IMAGES} pictures per car.
         </p>
       </div>
 
@@ -144,7 +145,7 @@ export default function AdminCarsPage() {
         </div>
 
         <div className="space-y-3">
-          <p className="text-sm text-white/70">Pictures ({form.images.length}/10)</p>
+          <p className="text-sm text-white/70">Pictures ({form.images.length}/{MAX_CAR_IMAGES})</p>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {form.images.map((src, i) => (
               <div key={`${src}-${i}`} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
@@ -159,7 +160,7 @@ export default function AdminCarsPage() {
               </div>
             ))}
           </div>
-          {form.images.length < 10 && (
+          {form.images.length < MAX_CAR_IMAGES && (
             <div className="space-y-2">
               <ImagePicker value={draftImage} onChange={setDraftImage} label="Add picture" />
               <AdminButton variant="secondary" onClick={addImage} disabled={!draftImage}>

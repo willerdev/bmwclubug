@@ -5,6 +5,7 @@ import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ImagePicker } from "@/components/admin/ImagePicker";
 import { AdminButton, AdminField, adminInput } from "@/components/admin/AdminUi";
+import { MAX_BLOG_IMAGES } from "@/lib/media-limits";
 
 type Post = {
   id: string;
@@ -51,8 +52,8 @@ export default function AdminBlogPage() {
 
   const addImage = () => {
     if (!draftImage.trim()) return;
-    if (form.mediaUrls.length >= 12) {
-      setError("Maximum 12 pictures per post");
+    if (form.mediaUrls.length >= MAX_BLOG_IMAGES) {
+      setError(`Maximum ${MAX_BLOG_IMAGES} pictures per post`);
       return;
     }
     setForm({
@@ -137,7 +138,7 @@ export default function AdminBlogPage() {
         </div>
 
         <div className="space-y-3">
-          <p className="text-sm text-white/70">Photos ({form.mediaUrls.length}/12)</p>
+          <p className="text-sm text-white/70">Photos ({form.mediaUrls.length}/{MAX_BLOG_IMAGES})</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {form.mediaUrls.map((src, i) => (
               <div key={`${src}-${i}`} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
@@ -157,7 +158,7 @@ export default function AdminBlogPage() {
               </div>
             ))}
           </div>
-          {form.mediaUrls.length < 12 && (
+          {form.mediaUrls.length < MAX_BLOG_IMAGES && (
             <div className="space-y-2">
               <ImagePicker value={draftImage} onChange={setDraftImage} label="Add photo" />
               <AdminButton variant="secondary" onClick={addImage} disabled={!draftImage}>

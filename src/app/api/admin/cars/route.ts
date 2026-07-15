@@ -1,6 +1,7 @@
 import { requireAdminSession } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
+import { MAX_CAR_IMAGES } from "@/lib/media-limits";
 
 export async function GET() {
   const { error } = await requireAdminSession("view");
@@ -15,7 +16,7 @@ export async function GET() {
         SELECT image_url FROM slide_car_images
         WHERE car_id = ${id}
         ORDER BY sort_order ASC, created_at ASC
-        LIMIT 10
+        LIMIT ${MAX_CAR_IMAGES}
       `;
       cars.push({
         id,

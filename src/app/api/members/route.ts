@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
-import { jsonError, jsonOk, mapMember } from "@/lib/api-helpers";
+import { jsonError, jsonOk, mapMember, parseCsvOrArray } from "@/lib/api-helpers";
 
 export async function GET() {
   try {
@@ -20,17 +20,17 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const sql = getSql();
-    const badges = Array.isArray(body.badges) ? body.badges.map(String) : [];
-    const cars = Array.isArray(body.cars)
-      ? body.cars.map(String)
-      : String(body.cars ?? "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
+    const badges = parseCsvOrArray(body.badges);
+    const awards = parseCsvOrArray(body.awards);
+    const cars = parseCsvOrArray(body.cars);
+    const gallery = parseCsvOrArray(body.gallery ?? body.gallery_urls);
+    const joinedAt = String(body.joinedAt ?? body.joined_at ?? "").slice(0, 10) || new Date().toISOString().slice(0, 10);
+
     const rows = await sql`
       INSERT INTO members (
         name, email, photo_url, bio, district, membership_level,
-        years_in_club, rank, badges, favorite_route, cars
+        years_in_club, rank, badges, favorite_route, cars,
+        joined_at, social_instagram, social_twitter, social_facebook, awards, gallery_urls
       ) VALUES (
         ${String(body.name ?? "")},
         ${String(body.email ?? "")},
@@ -38,11 +38,17 @@ export async function POST(req: NextRequest) {
         ${String(body.bio ?? "")},
         ${String(body.district ?? "")},
         ${String(body.membershipLevel ?? body.membership_level ?? "Enthusiast")},
-        ${Number(body.yearsInClub ?? body.years_in_club ?? 1)},
+        ${0},
         ${String(body.rank ?? "Active Member")},
         ${badges},
         ${String(body.favoriteRoute ?? body.favorite_route ?? "")},
-        ${cars}
+        ${cars},
+        ${joinedAt},
+        ${String(body.social?.instagram ?? body.socialInstagram ?? body.social_instagram ?? "")},
+        ${String(body.social?.twitter ?? body.socialTwitter ?? body.social_twitter ?? "")},
+        ${String(body.social?.facebook ?? body.socialFacebook ?? body.social_facebook ?? "")},
+        ${awards},
+        ${gallery}
       )
       RETURNING *
     `;

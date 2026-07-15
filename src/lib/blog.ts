@@ -1,4 +1,5 @@
 import { getSql } from "@/lib/db";
+import { MAX_BLOG_IMAGES } from "@/lib/media-limits";
 
 export type BlogPostType = "update" | "story" | "photo" | "video";
 
@@ -22,7 +23,7 @@ export function mapBlogPost(row: Record<string, unknown>) {
     excerpt: String(row.excerpt ?? ""),
     content: String(row.content ?? ""),
     coverUrl: String(row.cover_url ?? ""),
-    mediaUrls: media.slice(0, 12),
+    mediaUrls: media.slice(0, MAX_BLOG_IMAGES),
     videoUrl: String(row.video_url ?? ""),
     postType: (row.post_type || "update") as BlogPostType,
     likesCount: Number(row.likes_count ?? 0),

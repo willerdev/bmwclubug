@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { MAX_JOIN_VEHICLE_PHOTOS } from "@/lib/media-limits";
 import { motion } from "framer-motion";
 import { CheckCircle, Upload } from "lucide-react";
 import { useState } from "react";
@@ -116,6 +117,7 @@ function FileUpload({
   files,
   onChange,
   hint,
+  maxFiles = 1,
 }: {
   label: string;
   required?: boolean;
@@ -124,6 +126,7 @@ function FileUpload({
   files: File[];
   onChange: (files: File[]) => void;
   hint: string;
+  maxFiles?: number;
 }) {
   return (
     <Field label={label} required={required}>
@@ -142,7 +145,7 @@ function FileUpload({
           className="hidden"
           onChange={(e) => {
             const selected = Array.from(e.target.files ?? []);
-            onChange(multiple ? selected.slice(0, 5) : selected.slice(0, 1));
+            onChange(multiple ? selected.slice(0, maxFiles) : selected.slice(0, 1));
           }}
         />
       </label>
@@ -453,9 +456,10 @@ export default function JoinPage() {
                           required
                           accept="image/*"
                           multiple
+                          maxFiles={MAX_JOIN_VEHICLE_PHOTOS}
                           files={form.vehiclePhotos}
                           onChange={(files) => update("vehiclePhotos", files)}
-                          hint="Upload up to 5 images. Max 10 MB per file."
+                          hint={`Upload up to ${MAX_JOIN_VEHICLE_PHOTOS} images. Max 10 MB per file.`}
                         />
                       </div>
                       <div className="sm:col-span-2">

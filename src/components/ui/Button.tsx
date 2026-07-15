@@ -11,6 +11,8 @@ interface ButtonProps {
   size?: "sm" | "md" | "lg";
   className?: string;
   onClick?: () => void;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
 
 const variants = {
@@ -39,11 +41,14 @@ export function Button({
   size = "md",
   className,
   onClick,
+  type = "button",
+  disabled,
 }: ButtonProps) {
   const classes = cn(
     "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-300 backdrop-blur-xl",
     variants[variant],
     sizes[size],
+    disabled && "opacity-50 pointer-events-none",
     className
   );
 
@@ -67,6 +72,8 @@ export function Button({
       whileTap={{ scale: 0.98 }}
       className={classes}
       onClick={onClick}
+      type={type}
+      disabled={disabled}
     >
       {children}
     </motion.button>

@@ -82,6 +82,7 @@ export function buildRealMembers(): Member[] {
         `Proud BMW Club Uganda member from ${district}. Passionate about driving, community meetups, and the BMW lifestyle.`,
       district,
       membershipLevel: input.level ?? "Enthusiast",
+      joinedAt: new Date(Date.now() - Math.max(1, 3 - (i % 3)) * 365.25 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
       yearsInClub: Math.max(1, 3 - (i % 3)),
       rank: input.rank ?? "Active Member",
       badges: [BADGES[i % BADGES.length], BADGES[(i + 2) % BADGES.length]],

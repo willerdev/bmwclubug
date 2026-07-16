@@ -1,12 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CarDetailModal } from "@/components/cars/CarDetailModal";
 import { carGallery, type SlideCar } from "@/components/cars/types";
 import { useApiList } from "@/hooks/useApiData";
-import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Gauge } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -72,19 +70,15 @@ export function ModelsCarousel() {
             className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory"
             style={{ scrollbarWidth: "none" }}
           >
-            {cars.map((model, i) => {
+            {cars.map((model) => {
               const src = currentImage(model);
               const imgs = carGallery(model);
               return (
-                <motion.div
+                <div
                   key={model.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
                   className="snap-start shrink-0 w-[min(20rem,calc(100vw-2rem))]"
                 >
-                  <GlassCard className="p-0 overflow-hidden h-full">
+                  <GlassCard hover={false} className="p-0 overflow-hidden h-full">
                     <button
                       type="button"
                       className="w-full text-left"
@@ -133,17 +127,16 @@ export function ModelsCarousel() {
                       </div>
                     )}
                     <div className="px-5 pb-5">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
+                      <button
+                        type="button"
+                        className="w-full inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-300 px-4 py-2 text-sm glass border border-bmw-blue/40 text-bmw-blue-light hover:border-bmw-blue hover:bg-bmw-blue/10"
                         onClick={() => openCar(model)}
                       >
                         View Details
-                      </Button>
+                      </button>
                     </div>
                   </GlassCard>
-                </motion.div>
+                </div>
               );
             })}
           </div>

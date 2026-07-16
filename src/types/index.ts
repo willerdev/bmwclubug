@@ -145,6 +145,18 @@ export interface ShopProduct {
   image: string;
   category: string;
   description: string;
+  price: number;
+}
+
+export interface AttendedEvent {
+  id: string;
+  title: string;
+  date: string;
+  venue: string;
+  district: string;
+  poster: string;
+  description: string;
+  sortOrder: number;
 }
 
 export interface Vehicle {

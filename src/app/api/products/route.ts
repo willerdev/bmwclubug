@@ -21,12 +21,13 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const sql = getSql();
     const rows = await sql`
-      INSERT INTO products (name, image_url, category, description)
+      INSERT INTO products (name, image_url, category, description, price)
       VALUES (
         ${String(body.name ?? "")},
         ${String(body.image ?? body.image_url ?? "")},
         ${String(body.category ?? "Apparel")},
-        ${String(body.description ?? "")}
+        ${String(body.description ?? "")},
+        ${Number(body.price ?? 0)}
       )
       RETURNING *
     `;

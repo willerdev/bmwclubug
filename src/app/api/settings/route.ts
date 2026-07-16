@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk } from "@/lib/api-helpers";
@@ -11,7 +11,11 @@ export async function GET() {
     for (const row of rows) {
       settings[String(row.key)] = row.value;
     }
-    return jsonOk(settings);
+    return NextResponse.json(settings, {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      },
+    });
   } catch (error) {
     console.error(error);
     return jsonError("Failed to load settings", 500);

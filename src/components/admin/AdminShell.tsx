@@ -21,6 +21,8 @@ const FULL_NAV = [
   { href: "/admin/partners", label: "Partners", icon: Store },
   { href: "/admin/garages", label: "Garages", icon: Wrench },
   { href: "/admin/products", label: "Products", icon: ShoppingBag },
+  { href: "/admin/orders", label: "Shop Orders", icon: ShoppingBag },
+  { href: "/admin/attended-events", label: "Events Attended", icon: Calendar },
   { href: "/admin/applications", label: "Join Applications", icon: Users },
   { href: "/admin/members", label: "Members", icon: Users },
   { href: "/admin/gallery", label: "Gallery", icon: GalleryVerticalEnd },

@@ -4,39 +4,41 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { ScrollIndicator } from "@/components/effects/ScrollIndicator";
 import { LOCAL_IMAGES } from "@/lib/constants";
-import { useApiObject } from "@/hooks/useApiData";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 
-export function Hero() {
-  const { data: settings } = useApiObject<{
-    hero_image?: { url?: string };
-  }>("/api/settings", {});
-  const heroSrc = settings.hero_image?.url || LOCAL_IMAGES.hero;
-  const [memberCount, setMemberCount] = useState(45);
+interface HeroProps {
+  heroSrc?: string;
+  memberCount?: number;
+}
+
+export function Hero({ heroSrc: initialHeroSrc, memberCount: initialMemberCount }: HeroProps) {
+  const heroSrc = initialHeroSrc || LOCAL_IMAGES.hero;
+  const [memberCount, setMemberCount] = useState(initialMemberCount ?? 45);
 
   useEffect(() => {
+    if (initialMemberCount != null) return;
     fetch("/api/members")
       .then((r) => r.json())
       .then((list) => {
         if (Array.isArray(list)) setMemberCount(list.length);
       })
       .catch(() => undefined);
-  }, []);
+  }, [initialMemberCount]);
 
   const unoptimized = heroSrc.startsWith("/api/media");
 
   return (
     <section className="relative min-h-[100svh] w-full max-w-full flex flex-col overflow-hidden bg-bmw-navy">
-      {/* Mobile: clear photo band (not stretched full-bleed crop) */}
       <div className="relative sm:absolute sm:inset-0 w-full h-[42svh] min-h-[220px] max-h-[340px] sm:h-auto sm:min-h-0 sm:max-h-none shrink-0">
         <Image
           src={heroSrc}
           alt="BMW Club Uganda members"
           fill
           priority
-          quality={92}
+          fetchPriority="high"
+          quality={85}
           className="object-cover object-center sm:object-[center_40%] opacity-100 sm:opacity-75"
           sizes="100vw"
           unoptimized={unoptimized}
@@ -61,7 +63,7 @@ export function Hero() {
         >
           <div className="inline-flex max-w-full items-center gap-2 glass-panel px-3 sm:px-4 py-1 sm:py-2 rounded-full mb-3 sm:mb-8">
             <div className="relative w-4 h-4 sm:w-7 sm:h-7 rounded-full overflow-hidden shrink-0">
-              <Image src={LOCAL_IMAGES.logo} alt="" fill className="object-cover" sizes="28px" />
+              <Image src={LOCAL_IMAGES.logo} alt="" fill className="object-cover" sizes="28px" priority />
             </div>
             <span className="text-[10px] sm:text-sm text-white/85 truncate">
               Official BMW Enthusiast Community

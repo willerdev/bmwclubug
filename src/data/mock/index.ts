@@ -405,6 +405,7 @@ export const shopProducts: ShopProduct[] = [
     image: LOCAL_IMAGES.products[0],
     category: "Apparel",
     description: "Official white BMW Motorsport polo with club branding — as worn by members.",
+    price: 85000,
   },
   {
     id: "s2",
@@ -412,6 +413,7 @@ export const shopProducts: ShopProduct[] = [
     image: LOCAL_IMAGES.products[1],
     category: "Accessories",
     description: "Black BMW cap with matching M Power bag — official club merchandise.",
+    price: 120000,
   },
   {
     id: "s3",
@@ -419,6 +421,7 @@ export const shopProducts: ShopProduct[] = [
     image: LOCAL_IMAGES.products[2],
     category: "Apparel",
     description: "Clean white BMW Club Uganda polo for meets and everyday wear.",
+    price: 75000,
   },
   {
     id: "s4",
@@ -426,6 +429,7 @@ export const shopProducts: ShopProduct[] = [
     image: LOCAL_IMAGES.products[3],
     category: "Apparel",
     description: "Premium club polo — the signature look of BMW Club Uganda.",
+    price: 90000,
   },
 ];
 

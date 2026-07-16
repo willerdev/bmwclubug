@@ -12,6 +12,7 @@ type Stats = {
   members: number;
   pendingApplications: number;
   pendingEventRegistrations: number;
+  pendingOrders: number;
   gallery: number;
 };
 
@@ -28,6 +29,7 @@ export default function AdminDashboardPage() {
   const cards = [
     { label: "Events", value: stats?.events, href: "/admin/events" },
     { label: "Event Signups", value: stats?.pendingEventRegistrations, href: "/admin/event-registrations" },
+    { label: "Shop Orders", value: stats?.pendingOrders, href: "/admin/orders" },
     { label: "Partners", value: stats?.partners, href: "/admin/partners" },
     { label: "Garages", value: stats?.garages, href: "/admin/garages" },
     { label: "Products", value: stats?.products, href: "/admin/products" },

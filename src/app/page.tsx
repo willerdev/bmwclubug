@@ -3,6 +3,7 @@ import { AboutSection } from "@/components/home/AboutSection";
 import { StatsSection } from "@/components/home/StatsSection";
 import { ModelsCarousel } from "@/components/home/ModelsCarousel";
 import { EventsPreview } from "@/components/home/EventsPreview";
+import { EventsAttendedSection } from "@/components/home/EventsAttendedSection";
 import { MemberSpotlight } from "@/components/home/MemberSpotlight";
 import { PartnerGaragesPreview } from "@/components/home/PartnerGaragesPreview";
 import { MarketplacePreview } from "@/components/home/MarketplacePreview";
@@ -13,11 +14,27 @@ import { SponsorsSection } from "@/components/home/SponsorsSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { HomeBrandSection } from "@/components/home/HomeBrandSection";
 import { RevealOnScroll } from "@/components/effects/RevealOnScroll";
+import { fetchMembers, fetchSettings } from "@/lib/public-data";
+import { LOCAL_IMAGES } from "@/lib/constants";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  let heroSrc: string = LOCAL_IMAGES.hero;
+  let memberCount = 45;
+
+  try {
+    const [settings, members] = await Promise.all([fetchSettings(), fetchMembers()]);
+    const heroSetting = settings.hero_image as { url?: string } | undefined;
+    if (heroSetting?.url) heroSrc = heroSetting.url;
+    memberCount = members.length;
+  } catch {
+    // use defaults
+  }
+
   return (
     <>
-      <Hero />
+      <Hero heroSrc={heroSrc} memberCount={memberCount} />
       <RevealOnScroll>
         <AboutSection />
       </RevealOnScroll>
@@ -32,6 +49,9 @@ export default function HomePage() {
       </RevealOnScroll>
       <RevealOnScroll>
         <EventsPreview />
+      </RevealOnScroll>
+      <RevealOnScroll delay={0.05}>
+        <EventsAttendedSection />
       </RevealOnScroll>
       <RevealOnScroll delay={0.05}>
         <MemberSpotlight />

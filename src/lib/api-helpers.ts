@@ -63,6 +63,7 @@ export function mapProduct(row: Record<string, unknown>) {
     image: String(row.image_url ?? ""),
     category: String(row.category ?? ""),
     description: String(row.description ?? ""),
+    price: Number(row.price ?? 0),
   };
 }
 

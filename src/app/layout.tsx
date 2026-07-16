@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { PublicChrome } from "@/components/layout/PublicChrome";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { CartProvider } from "@/providers/CartProvider";
 import { AmbientBackground } from "@/components/effects/AmbientBackground";
 import { ParticleBackground } from "@/components/effects/ParticleBackground";
 import { MouseGlow } from "@/components/effects/MouseGlow";
@@ -63,10 +64,12 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} scroll-smooth`}>
       <body className="min-h-screen w-full max-w-full overflow-x-clip bg-background text-foreground antialiased">
         <QueryProvider>
-          <AmbientBackground />
-          <ParticleBackground />
-          <MouseGlow />
-          <PublicChrome>{children}</PublicChrome>
+          <CartProvider>
+            <AmbientBackground />
+            <ParticleBackground />
+            <MouseGlow />
+            <PublicChrome>{children}</PublicChrome>
+          </CartProvider>
         </QueryProvider>
       </body>
     </html>

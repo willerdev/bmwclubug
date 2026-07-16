@@ -1,6 +1,7 @@
 "use client";
 
 import { ClubLogo } from "@/components/ui/ClubLogo";
+import { CartButton } from "@/components/shop/CartButton";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -195,6 +196,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden xl:flex items-center gap-3">
+            <CartButton />
             <Link
               href="/join"
               className="px-5 py-2.5 text-sm glass-panel rounded-full font-medium glow-blue hover:bg-white/10 border border-bmw-blue/30 transition-all"
@@ -203,7 +205,9 @@ export function Navbar() {
             </Link>
           </div>
 
-          <button
+          <div className="xl:hidden flex items-center gap-2">
+            <CartButton />
+            <button
             onClick={() => setMobileOpen((open) => !open)}
             className="xl:hidden inline-flex items-center gap-2 px-3 py-2 text-white glass-panel rounded-full border border-white/15"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -212,6 +216,7 @@ export function Navbar() {
             {mobileOpen ? <X size={18} /> : <Menu size={18} />}
             <span className="text-xs font-medium tracking-wide">{mobileOpen ? "Close" : "Menu"}</span>
           </button>
+          </div>
         </div>
       </motion.nav>
 

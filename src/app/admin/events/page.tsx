@@ -6,7 +6,18 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { ImagePicker } from "@/components/admin/ImagePicker";
 import { MultiImagePicker } from "@/components/admin/MultiImagePicker";
 import { AdminButton, AdminField, adminInput } from "@/components/admin/AdminUi";
+import {
+  AdminFormWizard,
+  WizardActions,
+  type WizardStep,
+} from "@/components/admin/AdminFormWizard";
 import type { EventPost } from "@/types";
+
+const steps: WizardStep[] = [
+  { title: "Information", description: "Add the event schedule, location, capacity, and description." },
+  { title: "Images", description: "Choose the main poster and upload or select gallery images." },
+  { title: "Posts", description: "Publish updates and extra image posts for this event." },
+];
 
 type EventItem = {
   id: string;
@@ -53,6 +64,9 @@ export default function AdminEventsPage() {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [step, setStep] = useState(0);
+  const [maxVisited, setMaxVisited] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/events");
@@ -61,8 +75,17 @@ export default function AdminEventsPage() {
   }, []);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    let active = true;
+    fetch("/api/events")
+      .then((res) => res.json())
+      .then((data) => {
+        if (active) setItems(data);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const resetEditor = () => {
     setForm(empty);
@@ -71,6 +94,9 @@ export default function AdminEventsPage() {
     setPostForm(emptyPost);
     setEditingId(null);
     setEditingPostId(null);
+    setStep(0);
+    setMaxVisited(0);
+    setError("");
   };
 
   const loadEventContent = async (id: string) => {
@@ -79,11 +105,13 @@ export default function AdminEventsPage() {
     return res.json();
   };
 
-  const save = async () => {
+  const saveEventAndContinue = async () => {
     setMessage("");
     setError("");
+    setSaving(true);
     if (!form.title.trim()) {
       setError("Title is required");
+      setSaving(false);
       return;
     }
 
@@ -95,6 +123,7 @@ export default function AdminEventsPage() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setError(data.error || "Save failed");
+      setSaving(false);
       return;
     }
 
@@ -107,12 +136,47 @@ export default function AdminEventsPage() {
     if (!contentRes.ok) {
       const contentData = await contentRes.json().catch(() => ({}));
       setError(contentData.error || "Event saved, but gallery/posts failed");
+      setSaving(false);
       return;
     }
 
-    resetEditor();
-    setMessage("Saved");
+    setEditingId(eventId);
+    setStep(2);
+    setMaxVisited(2);
+    setMessage(editingId ? "Event details and images updated" : "Event created — you can now add posts");
+    setSaving(false);
     await load();
+  };
+
+  const next = () => {
+    setError("");
+    setMessage("");
+    if (step === 0) {
+      if (!form.title.trim()) {
+        setError("Enter an event title before continuing.");
+        return;
+      }
+      if (!form.date) {
+        setError("Choose an event date before continuing.");
+        return;
+      }
+      if (!form.venue.trim()) {
+        setError("Enter the event venue before continuing.");
+        return;
+      }
+      setStep(1);
+      setMaxVisited((current) => Math.max(current, 1));
+      return;
+    }
+    if (step === 1) {
+      if (!form.poster) {
+        setError("Choose a main event poster before continuing.");
+        return;
+      }
+      void saveEventAndContinue();
+      return;
+    }
+    resetEditor();
   };
 
   const savePost = async () => {
@@ -162,8 +226,14 @@ export default function AdminEventsPage() {
         </p>
       </div>
 
-      <GlassCard className="space-y-4">
-        <h2 className="font-bold text-lg">{editingId ? "Edit event" : "New event"}</h2>
+      <GlassCard className="space-y-4" hover={false}>
+        <AdminFormWizard
+          steps={steps}
+          current={step}
+          maxVisited={maxVisited}
+          onStepChange={setStep}
+        >
+        {step === 0 && (
         <div className="grid md:grid-cols-2 gap-4">
           <AdminField label="Title">
             <input className={adminInput} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
@@ -195,26 +265,49 @@ export default function AdminEventsPage() {
           <AdminField label="Description" className="md:col-span-2">
             <textarea className={adminInput} rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </AdminField>
-          <div className="md:col-span-2">
+        </div>
+        )}
+
+        {step === 1 && (
+          <div className="space-y-6">
             <ImagePicker value={form.poster} onChange={(poster) => setForm({ ...form, poster })} label="Main event poster" />
-          </div>
-          <div className="md:col-span-2">
             <MultiImagePicker value={gallery} onChange={setGallery} label="Event gallery images" max={30} />
           </div>
-        </div>
-        <div className="flex gap-3">
-          <AdminButton onClick={save}>{editingId ? "Update event" : "Create event"}</AdminButton>
-          {editingId && (
-            <AdminButton variant="secondary" onClick={resetEditor}>
-              Cancel
-            </AdminButton>
-          )}
-        </div>
+        )}
+
+        {step === 2 && (
+          <div className="glass-frosted rounded-2xl p-5 border border-bmw-blue/20">
+            <p className="text-sm text-bmw-blue-light">Event saved</p>
+            <h3 className="text-xl font-bold mt-1">{form.title}</h3>
+            <p className="text-sm text-white/50 mt-2">
+              Add a post below, attach multiple images, or edit and remove existing posts.
+            </p>
+          </div>
+        )}
+
         {error && <p className="text-sm text-bmw-red">{error}</p>}
         {message && <p className="text-sm text-bmw-blue-light">{message}</p>}
+        <WizardActions
+          current={step}
+          total={steps.length}
+          onBack={() => setStep((current) => Math.max(0, current - 1))}
+          onNext={next}
+          onCancel={editingId ? resetEditor : undefined}
+          nextLabel={
+            step === 1
+              ? editingId
+                ? "Save images & continue"
+                : "Create event & continue"
+              : step === 2
+                ? "Finish"
+                : undefined
+          }
+          busy={saving}
+        />
+        </AdminFormWizard>
       </GlassCard>
 
-      {editingId && (
+      {editingId && step === 2 && (
         <GlassCard className="space-y-4">
           <div>
             <h2 className="font-bold text-lg">{editingPostId ? "Edit event post" : "Add post / images to this event"}</h2>
@@ -333,6 +426,8 @@ export default function AdminEventsPage() {
                   onClick={async () => {
                     setEditingId(item.id);
                     setForm({ ...item });
+                    setStep(0);
+                    setMaxVisited(2);
                     const content = await loadEventContent(item.id);
                     setGallery(content.gallery || []);
                     setPosts(content.posts || []);

@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 }
 
 export async function PUT(req: NextRequest, ctx: Ctx) {
-  const unauthorized = await requireAdmin("update");
+  const unauthorized = await requireAdmin("add");
   if (unauthorized) return unauthorized;
   try {
     const { id } = await ctx.params;

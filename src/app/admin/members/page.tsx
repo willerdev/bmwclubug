@@ -6,9 +6,20 @@ import { ImagePicker } from "@/components/admin/ImagePicker";
 import { MultiImagePicker } from "@/components/admin/MultiImagePicker";
 import { MemberPhoto } from "@/components/members/MemberPhoto";
 import { AdminButton, AdminField, adminInput } from "@/components/admin/AdminUi";
+import {
+  AdminFormWizard,
+  WizardActions,
+  type WizardStep,
+} from "@/components/admin/AdminFormWizard";
 import { MEMBERSHIP_LEVELS } from "@/lib/constants";
 import { formatMemberTenure } from "@/lib/utils";
 import type { Member } from "@/types";
+
+const steps: WizardStep[] = [
+  { title: "Information", description: "Add the member's identity and club information." },
+  { title: "Photos", description: "Choose a profile photo and build the member gallery." },
+  { title: "Review", description: "Review the profile before saving it." },
+];
 
 const empty = {
   name: "",
@@ -34,13 +45,26 @@ export default function AdminMembersPage() {
   const [form, setForm] = useState(empty);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [step, setStep] = useState(0);
+  const [maxVisited, setMaxVisited] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     setItems(await (await fetch("/api/members")).json());
   }, []);
   useEffect(() => {
-    void load();
-  }, [load]);
+    let active = true;
+    fetch("/api/members")
+      .then((res) => res.json())
+      .then((data) => {
+        if (active) setItems(data);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const galleryList = form.gallery
     ? form.gallery.split(",").map((s) => s.trim()).filter(Boolean)
@@ -48,8 +72,10 @@ export default function AdminMembersPage() {
 
   const save = async () => {
     setError("");
+    setSaving(true);
     if (!form.name.trim()) {
       setError("Name is required");
+      setSaving(false);
       return;
     }
     const payload = {
@@ -80,11 +106,46 @@ export default function AdminMembersPage() {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setError(data.error || "Failed to save member");
+      setSaving(false);
       return;
     }
     setForm(empty);
     setEditingId(null);
+    setStep(0);
+    setMaxVisited(0);
+    setMessage(editingId ? "Member updated successfully" : "Member created successfully");
+    setSaving(false);
     await load();
+  };
+
+  const resetEditor = () => {
+    setForm(empty);
+    setEditingId(null);
+    setError("");
+    setStep(0);
+    setMaxVisited(0);
+  };
+
+  const next = () => {
+    setError("");
+    setMessage("");
+    if (step === 0) {
+      if (!form.name.trim()) {
+        setError("Enter the member's name before continuing.");
+        return;
+      }
+      if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+        setError("Enter a valid email address.");
+        return;
+      }
+    }
+    if (step < steps.length - 1) {
+      const nextStep = step + 1;
+      setStep(nextStep);
+      setMaxVisited((current) => Math.max(current, nextStep));
+      return;
+    }
+    void save();
   };
 
   return (
@@ -97,7 +158,14 @@ export default function AdminMembersPage() {
         </p>
       </div>
 
-      <GlassCard className="space-y-4">
+      <GlassCard className="space-y-4" hover={false}>
+        <AdminFormWizard
+          steps={steps}
+          current={step}
+          maxVisited={maxVisited}
+          onStepChange={setStep}
+        >
+        {step === 0 && (
         <div className="grid md:grid-cols-2 gap-4">
           <AdminField label="Name">
             <input className={adminInput} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -152,10 +220,16 @@ export default function AdminMembersPage() {
           <AdminField label="Bio" className="md:col-span-2">
             <textarea className={adminInput} rows={3} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
           </AdminField>
-          <div className="md:col-span-2">
-            <ImagePicker value={form.photo} onChange={(photo) => setForm({ ...form, photo })} label="Profile photo" />
-          </div>
-          <div className="md:col-span-2 space-y-3">
+        </div>
+        )}
+
+        {step === 1 && (
+          <div className="space-y-6">
+            <ImagePicker
+              value={form.photo}
+              onChange={(photo) => setForm({ ...form, photo })}
+              label="Profile photo"
+            />
             <MultiImagePicker
               value={galleryList}
               onChange={(gallery) => setForm({ ...form, gallery: gallery.join(", ") })}
@@ -163,23 +237,64 @@ export default function AdminMembersPage() {
               max={30}
             />
           </div>
-        </div>
+        )}
+
+        {step === 2 && (
+          <div className="grid md:grid-cols-[160px_1fr] gap-6 items-start">
+            <div className="relative aspect-square rounded-2xl overflow-hidden border border-white/10">
+              <MemberPhoto src={form.photo} alt={form.name || "Member"} sizes="160px" />
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-bmw-blue-light">
+                  {form.membershipLevel}
+                </p>
+                <h3 className="text-2xl font-bold mt-1">{form.name || "Unnamed member"}</h3>
+                <p className="text-sm text-white/50 mt-1">
+                  {form.rank} · {form.district}
+                </p>
+              </div>
+              {form.bio && <p className="text-sm text-white/65 leading-relaxed">{form.bio}</p>}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div className="glass-frosted rounded-xl p-3">
+                  <p className="text-lg font-bold text-bmw-blue">{galleryList.length}</p>
+                  <p className="text-[10px] text-white/40 uppercase">Gallery photos</p>
+                </div>
+                <div className="glass-frosted rounded-xl p-3">
+                  <p className="text-lg font-bold text-bmw-blue">
+                    {form.cars.split(",").filter((car) => car.trim()).length}
+                  </p>
+                  <p className="text-[10px] text-white/40 uppercase">Cars</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {error && <p className="text-sm text-bmw-red">{error}</p>}
-        <div className="flex gap-2">
-          <AdminButton onClick={save}>{editingId ? "Update" : "Create"}</AdminButton>
-          {editingId && (
-            <AdminButton
-              variant="secondary"
-              onClick={() => {
-                setEditingId(null);
-                setForm(empty);
-              }}
-            >
-              Cancel
-            </AdminButton>
-          )}
-        </div>
+        <WizardActions
+          current={step}
+          total={steps.length}
+          onBack={() => setStep((current) => Math.max(0, current - 1))}
+          onNext={next}
+          onCancel={editingId ? resetEditor : undefined}
+          nextLabel={
+            step === steps.length - 1
+              ? editingId
+                ? "Update member"
+                : "Create member"
+              : undefined
+          }
+          busy={saving}
+        />
+        </AdminFormWizard>
       </GlassCard>
+
+      {message && (
+        <div className="glass-panel border border-bmw-blue/30 rounded-xl px-4 py-3 text-sm text-bmw-blue-light">
+          {message}
+        </div>
+      )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((item) => {
@@ -202,6 +317,10 @@ export default function AdminMembersPage() {
                   variant="secondary"
                   onClick={() => {
                     setEditingId(item.id);
+                    setStep(0);
+                    setMaxVisited(2);
+                    setMessage("");
+                    setError("");
                     setForm({
                       name: item.name,
                       email: item.email,

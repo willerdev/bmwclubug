@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getSql } from "@/lib/db";
 import { jsonError, jsonOk, mapEvent } from "@/lib/api-helpers";
+import { deleteEventContent, getEventContent } from "@/lib/event-content";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -11,7 +12,12 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
     const sql = getSql();
     const rows = await sql`SELECT * FROM events WHERE id = ${id}`;
     if (!rows[0]) return jsonError("Not found", 404);
-    return jsonOk(mapEvent(rows[0] as Record<string, unknown>));
+    const content = await getEventContent(id);
+    const event = mapEvent(rows[0] as Record<string, unknown>);
+    const gallery = content.gallery.length
+      ? content.gallery
+      : [event.poster].filter(Boolean);
+    return jsonOk({ ...event, gallery, posts: content.posts });
   } catch (error) {
     console.error(error);
     return jsonError("Failed to load event", 500);
@@ -56,6 +62,7 @@ export async function DELETE(_req: NextRequest, ctx: Ctx) {
     const { id } = await ctx.params;
     const sql = getSql();
     await sql`DELETE FROM events WHERE id = ${id}`;
+    await deleteEventContent(id);
     return jsonOk({ ok: true });
   } catch (error) {
     console.error(error);

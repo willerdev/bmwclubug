@@ -7,6 +7,7 @@ import {
   mapPartner,
   mapProduct,
 } from "@/lib/api-helpers";
+import { getEventContent } from "@/lib/event-content";
 import type {
   Event,
   GalleryItem,
@@ -22,11 +23,17 @@ export async function fetchEvents(): Promise<Event[]> {
   return rows.map((r) => mapEvent(r as Record<string, unknown>) as Event);
 }
 
-export async function fetchEventById(id: string): Promise<Event | null> {
+export async function fetchEventById(id: string): Promise<(Event & { posts?: { id: string; title: string; content: string; images: string[]; createdAt: string }[] }) | null> {
   const sql = getSql();
   const rows = await sql`SELECT * FROM events WHERE id = ${id}`;
   if (!rows[0]) return null;
-  return mapEvent(rows[0] as Record<string, unknown>) as Event;
+  const event = mapEvent(rows[0] as Record<string, unknown>) as Event;
+  const content = await getEventContent(id);
+  return {
+    ...event,
+    gallery: content.gallery.length ? content.gallery : event.gallery,
+    posts: content.posts,
+  };
 }
 
 export async function fetchMembers(): Promise<Member[]> {

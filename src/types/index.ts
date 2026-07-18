@@ -41,6 +41,14 @@ export interface BMWModel {
   owner: string;
 }
 
+export interface EventPost {
+  id: string;
+  title: string;
+  content: string;
+  images: string[];
+  createdAt: string;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -53,6 +61,7 @@ export interface Event {
   registeredCount: number;
   maxCapacity: number;
   gallery: string[];
+  posts?: EventPost[];
   location: { lat: number; lng: number };
   status: "upcoming" | "past";
 }

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { ImagePicker } from "@/components/admin/ImagePicker";
+import { MultiImagePicker } from "@/components/admin/MultiImagePicker";
 import { AdminButton, AdminField, adminInput } from "@/components/admin/AdminUi";
 import { MAX_CAR_IMAGES } from "@/lib/media-limits";
 
@@ -39,7 +39,6 @@ export default function AdminCarsPage() {
   const [items, setItems] = useState<Car[]>([]);
   const [form, setForm] = useState(empty);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [draftImage, setDraftImage] = useState("");
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -50,18 +49,6 @@ export default function AdminCarsPage() {
   useEffect(() => {
     void load();
   }, [load]);
-
-  const addImage = () => {
-    if (!draftImage.trim()) return;
-    if (form.images.length >= MAX_CAR_IMAGES) {
-      setError(`Maximum ${MAX_CAR_IMAGES} pictures per car`);
-      return;
-    }
-    if (form.images.includes(draftImage)) return;
-    setForm({ ...form, images: [...form.images, draftImage] });
-    setDraftImage("");
-    setError("");
-  };
 
   const save = async () => {
     setError("");
@@ -85,7 +72,6 @@ export default function AdminCarsPage() {
     }
     setForm(empty);
     setEditingId(null);
-    setDraftImage("");
     await load();
   };
 
@@ -144,31 +130,15 @@ export default function AdminCarsPage() {
           </AdminField>
         </div>
 
-        <div className="space-y-3">
-          <p className="text-sm text-white/70">Pictures ({form.images.length}/{MAX_CAR_IMAGES})</p>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-            {form.images.map((src, i) => (
-              <div key={`${src}-${i}`} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
-                <Image src={src} alt="" fill className="object-cover" sizes="120px" unoptimized={src.startsWith("/api/media")} />
-                <button
-                  type="button"
-                  className="absolute top-1 right-1 text-[10px] px-1.5 py-0.5 rounded bg-black/70"
-                  onClick={() => setForm({ ...form, images: form.images.filter((_, idx) => idx !== i) })}
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
-          {form.images.length < MAX_CAR_IMAGES && (
-            <div className="space-y-2">
-              <ImagePicker value={draftImage} onChange={setDraftImage} label="Add picture" />
-              <AdminButton variant="secondary" onClick={addImage} disabled={!draftImage}>
-                Add picture to car
-              </AdminButton>
-            </div>
-          )}
-        </div>
+        <MultiImagePicker
+          value={form.images}
+          onChange={(images) => {
+            setForm({ ...form, images });
+            setError("");
+          }}
+          label="Car showcase pictures"
+          max={MAX_CAR_IMAGES}
+        />
 
         {error && <p className="text-sm text-bmw-red">{error}</p>}
         <div className="flex gap-2">
@@ -179,7 +149,6 @@ export default function AdminCarsPage() {
               onClick={() => {
                 setEditingId(null);
                 setForm(empty);
-                setDraftImage("");
               }}
             >
               Cancel

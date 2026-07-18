@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ImagePicker } from "@/components/admin/ImagePicker";
+import { MultiImagePicker } from "@/components/admin/MultiImagePicker";
 import { MemberPhoto } from "@/components/members/MemberPhoto";
 import { AdminButton, AdminField, adminInput } from "@/components/admin/AdminUi";
 import { MEMBERSHIP_LEVELS } from "@/lib/constants";
@@ -33,7 +34,6 @@ export default function AdminMembersPage() {
   const [form, setForm] = useState(empty);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [draftGallery, setDraftGallery] = useState("");
 
   const load = useCallback(async () => {
     setItems(await (await fetch("/api/members")).json());
@@ -84,15 +84,7 @@ export default function AdminMembersPage() {
     }
     setForm(empty);
     setEditingId(null);
-    setDraftGallery("");
     await load();
-  };
-
-  const addGalleryImage = () => {
-    if (!draftGallery.trim()) return;
-    const next = [...galleryList, draftGallery.trim()];
-    setForm({ ...form, gallery: next.join(", ") });
-    setDraftGallery("");
   };
 
   return (
@@ -164,30 +156,12 @@ export default function AdminMembersPage() {
             <ImagePicker value={form.photo} onChange={(photo) => setForm({ ...form, photo })} label="Profile photo" />
           </div>
           <div className="md:col-span-2 space-y-3">
-            <p className="text-sm text-white/70">Gallery ({galleryList.length})</p>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              {galleryList.map((src, i) => (
-                <div key={`${src}-${i}`} className="relative aspect-square rounded-xl overflow-hidden border border-white/10">
-                  <MemberPhoto src={src} alt="" className="rounded-none" sizes="120px" />
-                  <button
-                    type="button"
-                    className="absolute top-1 right-1 text-[10px] px-1.5 py-0.5 rounded bg-black/70"
-                    onClick={() =>
-                      setForm({
-                        ...form,
-                        gallery: galleryList.filter((_, idx) => idx !== i).join(", "),
-                      })
-                    }
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-            <ImagePicker value={draftGallery} onChange={setDraftGallery} label="Add gallery photo" />
-            <AdminButton variant="secondary" onClick={addGalleryImage} disabled={!draftGallery}>
-              Add to gallery
-            </AdminButton>
+            <MultiImagePicker
+              value={galleryList}
+              onChange={(gallery) => setForm({ ...form, gallery: gallery.join(", ") })}
+              label="Member gallery"
+              max={30}
+            />
           </div>
         </div>
         {error && <p className="text-sm text-bmw-red">{error}</p>}
@@ -199,7 +173,6 @@ export default function AdminMembersPage() {
               onClick={() => {
                 setEditingId(null);
                 setForm(empty);
-                setDraftGallery("");
               }}
             >
               Cancel

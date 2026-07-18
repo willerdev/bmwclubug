@@ -41,6 +41,7 @@ export default async function EventDetailPage({ params }: Props) {
   if (!event) notFound();
 
   const gallery = event.gallery?.length ? event.gallery : [event.poster].filter(Boolean);
+  const posts = event.posts ?? [];
   const lat = event.location?.lat ?? 0.3476;
   const lng = event.location?.lng ?? 32.5825;
   const spotsLeft =
@@ -68,14 +69,14 @@ export default async function EventDetailPage({ params }: Props) {
 
               <GlassCard>
                 <h3 className="font-bold text-lg mb-3">About This Event</h3>
-                <p className="text-white/70 leading-relaxed">{event.description}</p>
+                <p className="text-white/70 leading-relaxed whitespace-pre-wrap">{event.description}</p>
               </GlassCard>
 
               <GlassCard>
                 <h3 className="font-bold text-lg mb-3">Event Gallery</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {gallery.map((img, i) => (
-                    <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
+                    <div key={`${img}-${i}`} className="relative aspect-square rounded-xl overflow-hidden">
                       <Image
                         src={img}
                         alt=""
@@ -88,6 +89,41 @@ export default async function EventDetailPage({ params }: Props) {
                   ))}
                 </div>
               </GlassCard>
+
+              {posts.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="font-bold text-xl">Event Updates</h3>
+                  {posts.map((post) => (
+                    <GlassCard key={post.id} className="space-y-3">
+                      <div>
+                        <h4 className="font-bold text-lg">{post.title || "Update"}</h4>
+                        <p className="text-xs text-white/40 mt-1">
+                          {new Date(post.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                      {post.content && (
+                        <p className="text-white/70 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+                      )}
+                      {post.images?.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {post.images.map((img, i) => (
+                            <div key={`${img}-${i}`} className="relative aspect-square rounded-xl overflow-hidden">
+                              <Image
+                                src={img}
+                                alt=""
+                                fill
+                                className="object-cover"
+                                sizes="220px"
+                                unoptimized={img.startsWith("/api/media")}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </GlassCard>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-6">

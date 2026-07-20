@@ -25,6 +25,10 @@ export async function POST(req: NextRequest) {
     const cars = parseCsvOrArray(body.cars);
     const gallery = parseCsvOrArray(body.gallery ?? body.gallery_urls);
     const joinedAt = String(body.joinedAt ?? body.joined_at ?? "").slice(0, 10) || new Date().toISOString().slice(0, 10);
+    const badgesJson = JSON.stringify(badges);
+    const awardsJson = JSON.stringify(awards);
+    const carsJson = JSON.stringify(cars);
+    const galleryJson = JSON.stringify(gallery);
 
     const rows = await sql`
       INSERT INTO members (
@@ -40,15 +44,15 @@ export async function POST(req: NextRequest) {
         ${String(body.membershipLevel ?? body.membership_level ?? "Enthusiast")},
         ${0},
         ${String(body.rank ?? "Active Member")},
-        ${badges},
+        COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${badgesJson}::jsonb) AS t(v)), '{}'::text[]),
         ${String(body.favoriteRoute ?? body.favorite_route ?? "")},
-        ${cars},
+        COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${carsJson}::jsonb) AS t(v)), '{}'::text[]),
         ${joinedAt},
         ${String(body.social?.instagram ?? body.socialInstagram ?? body.social_instagram ?? "")},
         ${String(body.social?.twitter ?? body.socialTwitter ?? body.social_twitter ?? "")},
         ${String(body.social?.facebook ?? body.socialFacebook ?? body.social_facebook ?? "")},
-        ${awards},
-        ${gallery}
+        COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${awardsJson}::jsonb) AS t(v)), '{}'::text[]),
+        COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${galleryJson}::jsonb) AS t(v)), '{}'::text[])
       )
       RETURNING *
     `;

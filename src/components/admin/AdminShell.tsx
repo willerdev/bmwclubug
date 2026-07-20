@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Activity, BookOpen, Calendar, Car, GalleryVerticalEnd, Home, Image as ImageIcon, LayoutDashboard,
-  LogOut, Settings, Shield, ShoppingBag, Store, UserCog, Users, Wrench,
+  LogOut, Settings, Shield, ShoppingBag, Sparkles, Store, UserCog, Users, Wrench,
 } from "lucide-react";
 import { ClubLogo } from "@/components/ui/ClubLogo";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,7 @@ const FULL_NAV = [
   { href: "/admin/applications", label: "Join Applications", icon: Users },
   { href: "/admin/members", label: "Members", icon: Users },
   { href: "/admin/gallery", label: "Gallery", icon: GalleryVerticalEnd },
+  { href: "/admin/special", label: "Special", icon: Sparkles },
   { href: "/admin/media", label: "Media", icon: ImageIcon },
   { href: "/admin/users", label: "Staff Users", icon: UserCog },
   { href: "/admin/activity", label: "Activity", icon: Activity },

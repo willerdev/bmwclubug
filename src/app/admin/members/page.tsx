@@ -37,12 +37,12 @@ const empty = {
   socialInstagram: "",
   socialTwitter: "",
   socialFacebook: "",
-  gallery: "",
 };
 
 export default function AdminMembersPage() {
   const [items, setItems] = useState<Member[]>([]);
   const [form, setForm] = useState(empty);
+  const [gallery, setGallery] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -66,10 +66,6 @@ export default function AdminMembersPage() {
     };
   }, []);
 
-  const galleryList = form.gallery
-    ? form.gallery.split(",").map((s) => s.trim()).filter(Boolean)
-    : [];
-
   const save = async () => {
     setError("");
     setSaving(true);
@@ -78,6 +74,7 @@ export default function AdminMembersPage() {
       setSaving(false);
       return;
     }
+    const wasEditing = Boolean(editingId);
     const payload = {
       name: form.name,
       email: form.email,
@@ -91,7 +88,7 @@ export default function AdminMembersPage() {
       badges: form.badges,
       awards: form.awards,
       favoriteRoute: form.favoriteRoute,
-      gallery: galleryList,
+      gallery,
       social: {
         instagram: form.socialInstagram,
         twitter: form.socialTwitter,
@@ -110,16 +107,18 @@ export default function AdminMembersPage() {
       return;
     }
     setForm(empty);
+    setGallery([]);
     setEditingId(null);
     setStep(0);
     setMaxVisited(0);
-    setMessage(editingId ? "Member updated successfully" : "Member created successfully");
+    setMessage(wasEditing ? "Member updated successfully" : "Member created successfully");
     setSaving(false);
     await load();
   };
 
   const resetEditor = () => {
     setForm(empty);
+    setGallery([]);
     setEditingId(null);
     setError("");
     setStep(0);
@@ -231,8 +230,8 @@ export default function AdminMembersPage() {
               label="Profile photo"
             />
             <MultiImagePicker
-              value={galleryList}
-              onChange={(gallery) => setForm({ ...form, gallery: gallery.join(", ") })}
+              value={gallery}
+              onChange={setGallery}
               label="Member gallery"
               max={30}
             />
@@ -257,7 +256,7 @@ export default function AdminMembersPage() {
               {form.bio && <p className="text-sm text-white/65 leading-relaxed">{form.bio}</p>}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div className="glass-frosted rounded-xl p-3">
-                  <p className="text-lg font-bold text-bmw-blue">{galleryList.length}</p>
+                  <p className="text-lg font-bold text-bmw-blue">{gallery.length}</p>
                   <p className="text-[10px] text-white/40 uppercase">Gallery photos</p>
                 </div>
                 <div className="glass-frosted rounded-xl p-3">
@@ -321,6 +320,7 @@ export default function AdminMembersPage() {
                     setMaxVisited(2);
                     setMessage("");
                     setError("");
+                    setGallery(item.gallery || []);
                     setForm({
                       name: item.name,
                       email: item.email,
@@ -337,7 +337,6 @@ export default function AdminMembersPage() {
                       socialInstagram: item.social?.instagram || "",
                       socialTwitter: item.social?.twitter || "",
                       socialFacebook: item.social?.facebook || "",
-                      gallery: (item.gallery || []).join(", "),
                     });
                   }}
                 >

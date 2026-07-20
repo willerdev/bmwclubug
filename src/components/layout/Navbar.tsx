@@ -17,6 +17,7 @@ import {
   MessageSquare,
   Phone,
   ShoppingBag,
+  Sparkles,
   Store,
   Users,
   Wrench,
@@ -34,6 +35,7 @@ const DESKTOP_LINKS = [
   { href: "/blog", label: "Blog" },
   { href: "/garages", label: "Garages" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/special", label: "Special" },
   { href: "/partners", label: "Partners" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -61,6 +63,7 @@ const MOBILE_MENU = [
       { href: "/blog", label: "Blog", icon: BookOpen },
       { href: "/garages", label: "Garages", icon: Wrench },
       { href: "/gallery", label: "Gallery", icon: Camera },
+      { href: "/special", label: "Special", icon: Sparkles },
       { href: "/partners", label: "Partners", icon: Store },
     ],
   },

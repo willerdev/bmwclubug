@@ -39,9 +39,17 @@ export async function POST(req: NextRequest) {
     const form = await req.formData();
     const file = form.get("file");
     if (!(file instanceof File)) return jsonError("file is required");
-    if (file.size > 8 * 1024 * 1024) return jsonError("File too large (max 8MB)");
-    const buffer = Buffer.from(await file.arrayBuffer());
     const mime = file.type || "application/octet-stream";
+    const isVideo = mime.startsWith("video/");
+    const isImage = mime.startsWith("image/");
+    if (!isImage && !isVideo) {
+      return jsonError("Only image or video uploads are allowed");
+    }
+    const maxBytes = isVideo ? 40 * 1024 * 1024 : 8 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      return jsonError(isVideo ? "Video too large (max 40MB)" : "Image too large (max 8MB)");
+    }
+    const buffer = Buffer.from(await file.arrayBuffer());
     const sql = getSql();
     const rows = await sql`
       INSERT INTO media (filename, mime, data)

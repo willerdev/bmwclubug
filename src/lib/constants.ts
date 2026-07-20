@@ -67,6 +67,7 @@ export const NAV_LINKS = [
   { href: "/marketplace", label: "Marketplace" },
   { href: "/routes", label: "Routes" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/special", label: "Special" },
   { href: "/forum", label: "Forum" },
   { href: "/blog", label: "Blog" },
   { href: "/partners", label: "Partners" },

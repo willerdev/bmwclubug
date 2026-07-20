@@ -30,6 +30,10 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     const cars = parseCsvOrArray(body.cars);
     const gallery = parseCsvOrArray(body.gallery ?? body.gallery_urls);
     const joinedAt = String(body.joinedAt ?? body.joined_at ?? "").slice(0, 10) || new Date().toISOString().slice(0, 10);
+    const badgesJson = JSON.stringify(badges);
+    const awardsJson = JSON.stringify(awards);
+    const carsJson = JSON.stringify(cars);
+    const galleryJson = JSON.stringify(gallery);
 
     const rows = await sql`
       UPDATE members SET
@@ -40,15 +44,15 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
         district = ${String(body.district ?? "")},
         membership_level = ${String(body.membershipLevel ?? body.membership_level ?? "Enthusiast")},
         rank = ${String(body.rank ?? "Active Member")},
-        badges = ${badges},
+        badges = COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${badgesJson}::jsonb) AS t(v)), '{}'::text[]),
         favorite_route = ${String(body.favoriteRoute ?? body.favorite_route ?? "")},
-        cars = ${cars},
+        cars = COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${carsJson}::jsonb) AS t(v)), '{}'::text[]),
         joined_at = ${joinedAt},
         social_instagram = ${String(body.social?.instagram ?? body.socialInstagram ?? body.social_instagram ?? "")},
         social_twitter = ${String(body.social?.twitter ?? body.socialTwitter ?? body.social_twitter ?? "")},
         social_facebook = ${String(body.social?.facebook ?? body.socialFacebook ?? body.social_facebook ?? "")},
-        awards = ${awards},
-        gallery_urls = ${gallery},
+        awards = COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${awardsJson}::jsonb) AS t(v)), '{}'::text[]),
+        gallery_urls = COALESCE((SELECT array_agg(v) FROM jsonb_array_elements_text(${galleryJson}::jsonb) AS t(v)), '{}'::text[]),
         updated_at = NOW()
       WHERE id = ${id}
       RETURNING *
